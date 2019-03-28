@@ -10,11 +10,13 @@
     <button @click="zoomReset()">Reset Zoom</button>
     <div>Zoom {{zoom*100}}%</div>
     <button @click="toggleGrid()">{{showGrid ? 'Hide Grid' : 'Show Grid'}}</button>
+    <button v-if="showGrid" @click="toggleRuler()">{{showRuler ? 'Hide Ruler' : 'Show Ruler'}}</button>
     <Tiles :list="updatedList" 
            :canvas-width="canvasWidth" 
            :canvas-height="canvasHeight" 
            :tile-size="tileSize * zoom" 
            :show-grid="showGrid"
+           :show-ruler="showRuler"
            @update-tiles="updateTiles"/>
     <textarea v-if="generatedArt" v-model="generatedArt">
     </textarea>
@@ -38,8 +40,10 @@ export default {
       canvasWidth: 20,
       canvasHeight: 15,
       showGrid: true,
+      showRuler: true,
       zoom: 1,
       tileSize: 50,
+      newColor: '',
       currentColor: {
         id: '0',
         name: 'transparent',
@@ -147,6 +151,9 @@ export default {
     },
     toggleGrid(){
       this.showGrid = !this.showGrid;
+    },
+    toggleRuler(){
+      this.showRuler = !this.showRuler;
     },
     addColor(){
       this.paletteList.push({
