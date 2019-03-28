@@ -1,9 +1,12 @@
 <template>
-  <ul class="tiles" :style="canvasStyle">
-    <li v-for="(tile, i) in list" :key="i" :style="{backgroundColor: tile.color}" @click="paintThis(tile.id)">
-      <div>{{tile.id}}</div> 
+  <ul :class="['tiles', {'tiles--grid' : showGrid}]" :style="canvasStyle">
+    <li v-for="(tile, i) in list" :key="i" 
+      :style="{backgroundColor: tile.color}"
+       @mouseenter="paintThis(tile.id)"
+       :class="{'first-row' : i < canvasWidth}">
+      <!-- <div>{{tile.id}}</div> 
       <div>x: {{tile.xs}}</div>
-      <div>y: {{tile.ys}}</div>
+      <div>y: {{tile.ys}}</div> -->
     </li>
   </ul>
 </template>
@@ -27,6 +30,10 @@ export default {
     canvasHeight: {
       required: false,
       type: Number
+    },
+    showGrid: {
+      required: false,
+      type: Boolean
     }
   },
   computed: {
@@ -49,12 +56,29 @@ export default {
 <style scoped>
 .tiles{
   display: grid;
+  margin: 0 auto;
+  padding: 0;
+
+  --border-color: rgba(0, 0, 0, 0.11);
+  --border-size: 2px;
 }
 
 .tiles li{
   list-style-type: none;
   margin: 0;
   font-size: 8px;
-  border: 1px solid #000;
+}
+
+.tiles.tiles--grid{
+  border-left: var(--border-size) dashed var(--border-color);
+}
+
+.tiles.tiles--grid li{
+  border-bottom: var(--border-size) dashed var(--border-color);
+  border-right: var(--border-size) dashed var(--border-color);
+}
+
+.tiles.tiles--grid li.first-row{
+  border-top: var(--border-size) dashed var(--border-color);
 }
 </style>

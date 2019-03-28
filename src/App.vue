@@ -2,12 +2,19 @@
   <div id="app">
     Jiji Editor
     <ColorPalette :palette-list="paletteList" @current-color="pickedColor"/>
-    Current Color: <div class="current-color" :style="{backgroundColor: currentColor.value}"></div> {{this.currentColor.name}}
+    <input type="text" value="#" placeholder="#000000" v-model="newColor"/><button @click="addColor()">Add Color</button>
+    Current Color: <div class="current-color" :style="{backgroundColor: currentColor.value}"></div> {{this.currentColor.value}}
     <button @click="generateArt()">Generate</button>
+    <button @click="zoomIn()">Zoom In</button>
+    <button @click="zoomOut()">Zoom Out</button>
+    <button @click="zoomReset()">Reset Zoom</button>
+    <div>Zoom {{zoom*100}}%</div>
+    <button @click="toggleGrid()">{{showGrid ? 'Hide Grid' : 'Show Grid'}}</button>
     <Tiles :list="updatedList" 
            :canvas-width="canvasWidth" 
            :canvas-height="canvasHeight" 
-           :tile-size="tileSize" 
+           :tile-size="tileSize * zoom" 
+           :show-grid="showGrid"
            @update-tiles="updateTiles"/>
     <textarea v-if="generatedArt" v-model="generatedArt">
     </textarea>
@@ -28,9 +35,11 @@ export default {
     return {
       generatedArt: null,
       updatedList: [],
-      canvasWidth: 6,
-      canvasHeight: 4,
-      tileSize: 100,
+      canvasWidth: 20,
+      canvasHeight: 15,
+      showGrid: true,
+      zoom: 1,
+      tileSize: 50,
       currentColor: {
         id: '0',
         name: 'transparent',
@@ -39,47 +48,38 @@ export default {
       paletteList: [
         {
           id: 'c0',
-          name: 'transparent',
           value: 'transparent'
         },
         {
           id: 'c1',
-          name: 'red',
           value: 'red'
         },
         {
           id: 'c2',
-          name: 'black',
           value: 'black'
         },
         {
           id: 'c3',
-          name: 'green',
           value: 'green'
         },
         {
           id: 'c4',
-          name: 'blue',
           value: 'blue'
         },
         {
           id: 'c5',
-          name: 'yellow',
           value: 'yellow'
         },
         {
           id: 'c6',
-          name: 'orange',
           value: 'orange'
         },
         {
           id: 'c7',
-          name: 'purple',
           value: 'purple'
         },
         {
           id: 'c8',
-          name: 'white',
           value: 'white'
         }
       ]
@@ -131,6 +131,29 @@ export default {
         </div>
       `;
       this.generatedArt = html;
+    },
+    zoomIn(){
+      const percentage = 0.25;
+      this.zoom = this.zoom + percentage <= 8 ? this.zoom + percentage : 8;
+    },
+    zoomOut(){
+      const percentage = 0.25;
+      console.log(this.zoom - percentage)
+      this.zoom = this.zoom - percentage >= 0.1 ? this.zoom - percentage : 1/this.tileSize;
+      console.log(this.tileSize, this.tileSize* (1/this.tileSize))
+    },
+    zoomReset(){
+      this.zoom = 1;
+    },
+    toggleGrid(){
+      this.showGrid = !this.showGrid;
+    },
+    addColor(){
+      this.paletteList.push({
+        id: this.newColor,
+        value: this.newColor
+      });
+      this.newColor = '';
     }
   }
 }
