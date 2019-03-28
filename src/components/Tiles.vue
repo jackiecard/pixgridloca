@@ -2,7 +2,9 @@
   <ul :class="['tiles', {'tiles--grid' : showGrid}]" :style="canvasStyle">
     <li v-for="(tile, i) in list" :key="i" 
       :style="{backgroundColor: tile.color}"
-       @mouseenter="paintThis(tile.id)"
+       @mousedown.prevent="clicked(tile.id)"
+       @mouseup.prevent="release(tile.id)"
+       @mouseover.prevent="over(tile.id)"
        :class="{'first-row' : i < canvasWidth}">
       <!-- <div>{{tile.id}}</div> 
       <div>x: {{tile.xs}}</div>
@@ -36,6 +38,11 @@ export default {
       type: Boolean
     }
   },
+  data(){
+    return {
+      clickedItemId: null
+    }
+  },
   computed: {
     canvasStyle(){
       return [
@@ -45,9 +52,17 @@ export default {
     },
   },
   methods: {
-    paintThis(id){
-      console.log('update-tiles', id)
+    clicked(id){
       this.$emit('update-tiles', { id: id });
+      this.clickedItemId = id;
+    },
+    release(id){
+      this.clickedItemId = null;
+    },
+    over(id){
+      if(this.clickedItemId && this.clickedItemId !== id){
+        this.$emit('update-tiles', { id: id });
+      }
     }
   }
 }
