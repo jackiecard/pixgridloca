@@ -9,21 +9,33 @@
       <template slot="palette">
         <ColorPalette :palette-list="paletteList" @current-color="pickedColor"/>
         <div class="palette__info">
-          <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
+          <button v-popover:add-color :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
             <span class="current-color__doubled">Already here!</span>
-          </div>
-          <input type="text" placeholder="#000000" v-model="newColor"/>
-          <button class="btn" @click="setColor(newColor)">Add Color <font-awesome-icon icon="plus" /></button>
+          </button>
+          <button class="btn" v-popover:add-color>Add Color <font-awesome-icon icon="plus" /></button>
+          <popover name="add-color" width="220">
+            <sketch-picker v-model="newColor" />
+            <button class="btn" @click="setColor(newColor.hex)">Add Color <font-awesome-icon icon="plus" /></button>
+          </popover>
         </div>
       </template>
 
       <template slot="control">
         <button :class="['btn', {'btn--active': isEraser}]" @click="eraser(true)">Eraser <font-awesome-icon icon="eraser" /></button>
         <button :class="['btn', {'btn--active': !isEraser}]" @click="eraser(false)">Pencil <font-awesome-icon icon="pen" /></button>
-        <button class="btn" @click="generateArt()">Generate <font-awesome-icon icon="plus-circle" /></button>
-        <button class="btn" @click="zoomIn()">Zoom In <font-awesome-icon icon="search-plus" /></button>
-        <button class="btn" @click="zoomOut()">Zoom Out <font-awesome-icon icon="search-minus" /></button>
-        <button class="btn" @click="zoomReset()">Reset Zoom <font-awesome-icon icon="search" /></button>
+        <button class="btn">Settings <font-awesome-icon icon="cog" /></button>
+        <button class="btn" @click="generateArt()" v-popover:generate>Generate <font-awesome-icon icon="plus-circle" /></button>
+        <popover name="generate">
+          <h3>Generated HTML</h3>
+          <textarea v-if="generatedArt" v-model="generatedArt">
+          </textarea>
+        </popover>
+        <button class="btn" v-popover:zoom>Zoom <font-awesome-icon icon="search" /></button>
+        <popover name="zoom">
+          <button :class="['btn', {'btn--disabled': zoom === 8}]" @click="zoomIn()">Zoom In <font-awesome-icon icon="search-plus" /></button>
+          <button  :class="['btn', {'btn--disabled': zoom === 1/ this.tileSize}]" @click="zoomOut()">Zoom Out <font-awesome-icon icon="search-minus" /></button>
+          <button class="btn" @click="zoomReset()">Reset Zoom <font-awesome-icon icon="search" /></button>
+        </popover>
         <button class="btn" @click="generateList()">Clean <font-awesome-icon icon="times" /></button>
         <button class="btn" @click="undo()">Undo <font-awesome-icon icon="undo" /></button>
         <div>Zoom {{zoom*100}}%</div>
@@ -40,8 +52,6 @@
       <button class="btn" @click="toggleGrid()">{{showGrid ? 'Hide Grid' : 'Show Grid'}} <font-awesome-icon icon="th-large" /></button>
       <button class="btn" v-if="showGrid" @click="toggleRuler()">{{showRuler ? 'Hide Ruler' : 'Show Ruler'}} <font-awesome-icon icon="ruler" /></button>
     </div>
-    <textarea v-if="generatedArt" v-model="generatedArt">
-    </textarea>
   </div>
 </template>
 
@@ -161,5 +171,49 @@ export default {
       transform: rotate(-20deg) scale(1, 1);
     }
   }
+}
+
+button{
+  &.btn{
+    position: relative;
+    background-color: transparent;
+    border: 0;
+    font-size: 0;
+
+    &:after{
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: calc(100% - 2px);
+      height: calc(100% - 2px);
+      border: 1px solid var(--border-color);
+    }
+
+    &--active{
+      &:before{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: calc(100% - 6px);
+        height: calc(100% - 6px);
+        border: 2px solid var(--border-color-active);
+      }
+    }
+
+    &--disabled{
+      color: rgba(0, 0, 0, 0.2);
+      pointer-events: none;
+    }
+
+    .svg-inline--fa{
+      height: 20px;
+    }
+  }
+}
+
+.vc-sketch{
+  box-shadow: none;
 }
 </style>

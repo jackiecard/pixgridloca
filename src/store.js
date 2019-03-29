@@ -70,10 +70,7 @@ const mutations = {
   },
   zoomOut(state) {
     const percentage = 0.25;
-    state.zoom =
-      state.zoom - percentage >= 0.1
-        ? state.zoom - percentage
-        : 1 / state.tileSize;
+    state.zoom = state.zoom - percentage >= 0.1 ? state.zoom - percentage : 1 / state.tileSize;
   },
   zoomReset(state) {
     state.zoom = 1;
@@ -88,7 +85,6 @@ const mutations = {
     state.currentColor = payload;
   },
   setUpdatedList(state, payload) {
-    console.log(payload.pressed);
     if(payload.first) {
       state.backupList = payload.list;
     }
@@ -97,7 +93,12 @@ const mutations = {
     }
     state.updatedList = payload.list;
   },
-  generateArt(state) {
+  generateArt(state, payload) {
+    if(payload && payload.clear) {
+      state.generatedArt = null;
+      return;
+    }
+
     let list = "";
     state.updatedList.forEach(item => {
       if (item.color !== "transparent") {
@@ -136,7 +137,10 @@ const mutations = {
 };
 
 const actions = {
-  setUpdatedList: ({ commit }, payload) => commit("setUpdatedList", payload),
+  setUpdatedList: ({ commit }, payload) => {
+    commit("setUpdatedList", payload);
+    commit("generateArt", {clear: true}); 
+  },
   toggleGrid: ({ commit }) => commit("toggleGrid"),
   toggleRuler: ({ commit }) => commit("toggleRuler"),
   zoomIn: ({ commit }) => commit("zoomIn"),
@@ -156,12 +160,14 @@ const actions = {
     }
 
     commit("addColor", payload);
+    const newColor = state.paletteList.filter(x => x.value === payload)[0];
+    commit("pickedColor", newColor);
   },
   pickedColor: ({ commit }, payload) => {
     commit("eraser", false);
     commit("pickedColor", payload);
   },
-  generateArt: ({ commit }) => commit("generateArt"),
+  generateArt: ({ commit }, payload) => commit("generateArt", payload),
   eraser: ({ commit }, payload) => commit("eraser", payload),
   undo: ({ commit }) => commit("undo")
 };

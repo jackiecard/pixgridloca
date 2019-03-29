@@ -34,40 +34,5 @@ body{
   input{
     font-family: 'Inconsolata', monospace;
   }
-
-  button{
-    &.btn{
-      position: relative;
-      background-color: transparent;
-      border: 0;
-      font-size: 0;
-
-      &:after{
-        content: "";
-        position: absolute;
-        top: -1px;
-        left: -1px;
-        width: calc(100% - 2px);
-        height: calc(100% - 2px);
-        border: 1px solid var(--border-color);
-      }
-
-      &--active{
-        &:before{
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: calc(100% - 6px);
-          height: calc(100% - 6px);
-          border: 2px solid var(--border-color-active);
-        }
-      }
-
-      .svg-inline--fa{
-        height: 20px;
-      }
-    }
-  }
 }
 </style>

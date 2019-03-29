@@ -28,6 +28,8 @@ export default {
 
 <style lang="scss" scoped>
 .color-palette{
+  --border-color: rgb(174, 174, 174);
+
   position: relative;
   display: grid;
   grid-template-columns: repeat(40, 30px);
@@ -49,7 +51,7 @@ export default {
     &__tile{
       width: 30px;
       height: 30px;
-      border: 1px solid rgb(174, 174, 174);
+      border: 1px solid var(--border-color);
     }
   }
 }
@@ -58,10 +60,10 @@ export default {
   position: relative;
   z-index: 1;
   list-style-type: none;
-  margin: 0;
+  margin: 2px 0 0 2px;
   font-size: 8px;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #000;
+  width: 28px;
+  height: 28px;
+  padding: 0;
 }
 </style>

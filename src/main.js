@@ -3,16 +3,17 @@ import store from "./store";
 import { library, config } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
+import Popover from "vue-js-popover";
+import { Sketch } from "vue-color";
 
-// This is important, we are going to let Nuxt.js worry about the CSS
+Vue.use(Popover);
+
 config.autoAddCss = false;
 
-// You can add your icons directly in this plugin. See other examples for how you
-// can add other styles or just individual icons.
 library.add(fas);
 
-// Register the component globally
 Vue.component("font-awesome-icon", FontAwesomeIcon);
+Vue.component('sketch-picker', Sketch);
 
 import App from "./App.vue";
 import Editor from "./components/Editor.vue";
