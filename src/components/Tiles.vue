@@ -6,11 +6,10 @@
        @mouseup.prevent="release(tile.id)"
        @mouseover.prevent="over(tile.id)"
        :class="[{'first-row' : i < canvasWidth}, {'first-column' : i % canvasWidth === 0}]">
-      <!-- <div>{{tile.id}}</div> -->
       <div class="tile__info">
-        <div class="tile__info__x">{{tile.xs}}</div>
-        <div class="tile__info__y">{{tile.ys}}</div> 
-        <div class="tile__info__xy">0</div>
+        <div class="tile__info__x">{{tile.xs + 1}}</div>
+        <div class="tile__info__y">{{tile.ys + 1}}</div> 
+        <div class="tile__info__xy">1</div>
       </div>
     </li>
   </ul>
