@@ -46,7 +46,7 @@ export default {
   },
   data(){
     return {
-      clickedItemId: null
+      pressedItemId: null
     }
   },
   computed: {
@@ -59,15 +59,15 @@ export default {
   },
   methods: {
     clicked(id){
-      this.$emit('update-tiles', { id: id });
-      this.clickedItemId = id;
+      this.$emit('update-tiles', { id: id, pressed: false });
+      this.pressedItemId = id;
     },
     release(id){
-      this.clickedItemId = null;
+      this.pressedItemId = null;
     },
     over(id){
-      if(this.clickedItemId && this.clickedItemId !== id){
-        this.$emit('update-tiles', { id: id });
+      if(this.pressedItemId && this.pressedItemId !== id){
+        this.$emit('update-tiles', { id: id, pressed: true });
       }
     }
   }
@@ -80,7 +80,7 @@ export default {
   margin: 30px;
   padding: 0;
 
-  --border-color: rgba(0, 0, 0, 0.11);
+  --border-color: rgba(0, 0, 0, 0.1);
   --border-size: 2px;
 
   li{

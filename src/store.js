@@ -7,6 +7,7 @@ Vue.use(Vuex);
 const state = {
   generatedArt: null,
   updatedList: [],
+  backupList: [],
   canvasWidth: 20,
   canvasHeight: 15,
   showGrid: true,
@@ -87,7 +88,14 @@ const mutations = {
     state.currentColor = payload;
   },
   setUpdatedList(state, payload) {
-    state.updatedList = payload;
+    console.log(payload.pressed);
+    if(payload.first) {
+      state.backupList = payload.list;
+    }
+    else if(!payload.pressed) {
+      state.backupList = state.updatedList;
+    }
+    state.updatedList = payload.list;
   },
   generateArt(state) {
     let list = "";
@@ -117,8 +125,13 @@ const mutations = {
       state.bouncePickedColor = false;
     }, 1000);
   },
-  eraser(state, payload){
+  eraser(state, payload) {
     state.isEraser = payload;
+  },
+  undo(state){
+    const backup = state.updatedList;
+    state.updatedList = state.backupList;
+    state.backupList = backup;
   }
 };
 
@@ -146,10 +159,11 @@ const actions = {
   },
   pickedColor: ({ commit }, payload) => {
     commit("eraser", false);
-    commit("pickedColor", payload)
+    commit("pickedColor", payload);
   },
   generateArt: ({ commit }) => commit("generateArt"),
-  eraser: ({ commit }, payload) => commit("eraser", payload)
+  eraser: ({ commit }, payload) => commit("eraser", payload),
+  undo: ({ commit }) => commit("undo")
 };
 
 const getters = {
@@ -165,7 +179,8 @@ const getters = {
   currentColor: state => state.currentColor,
   paletteList: state => state.paletteList,
   bouncePickedColor: state => state.bouncePickedColor,
-  isEraser: state => state.isEraser
+  isEraser: state => state.isEraser,
+  backupList: state => state.backupList
 };
 
 // const vuexPersist = new VuexPersist({

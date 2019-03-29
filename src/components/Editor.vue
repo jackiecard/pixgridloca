@@ -12,18 +12,20 @@
           <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
             <span class="current-color__doubled">Already here!</span>
           </div>
-          <input type="text" placeholder="#000000" v-model="newColor"/><button @click="setColor(newColor)">Add Color <font-awesome-icon icon="plus" /></button>
+          <input type="text" placeholder="#000000" v-model="newColor"/>
+          <button class="btn" @click="setColor(newColor)">Add Color <font-awesome-icon icon="plus" /></button>
         </div>
       </template>
 
       <template slot="control">
-        <button @click="eraser(true)">Eraser <font-awesome-icon icon="eraser" /></button>
-        <button @click="eraser(false)">Pencil <font-awesome-icon icon="pen" /></button>
-        <button @click="generateArt()">Generate <font-awesome-icon icon="plus-circle" /></button>
-        <button @click="zoomIn()">Zoom In <font-awesome-icon icon="search-plus" /></button>
-        <button @click="zoomOut()">Zoom Out <font-awesome-icon icon="search-minus" /></button>
-        <button @click="zoomReset()">Reset Zoom <font-awesome-icon icon="search" /></button>
-        <button @click="generateList()">Clean <font-awesome-icon icon="times" /></button>
+        <button :class="['btn', {'btn--active': isEraser}]" @click="eraser(true)">Eraser <font-awesome-icon icon="eraser" /></button>
+        <button :class="['btn', {'btn--active': !isEraser}]" @click="eraser(false)">Pencil <font-awesome-icon icon="pen" /></button>
+        <button class="btn" @click="generateArt()">Generate <font-awesome-icon icon="plus-circle" /></button>
+        <button class="btn" @click="zoomIn()">Zoom In <font-awesome-icon icon="search-plus" /></button>
+        <button class="btn" @click="zoomOut()">Zoom Out <font-awesome-icon icon="search-minus" /></button>
+        <button class="btn" @click="zoomReset()">Reset Zoom <font-awesome-icon icon="search" /></button>
+        <button class="btn" @click="generateList()">Clean <font-awesome-icon icon="times" /></button>
+        <button class="btn" @click="undo()">Undo <font-awesome-icon icon="undo" /></button>
         <div>Zoom {{zoom*100}}%</div>
       </template>
     </Toolbar>
@@ -35,8 +37,8 @@
            :show-ruler="showRuler"
            @update-tiles="updateTiles"/>
     <div class="grid-info">
-      <button @click="toggleGrid()">{{showGrid ? 'Hide Grid' : 'Show Grid'}} <font-awesome-icon icon="th-large" /></button>
-      <button v-if="showGrid" @click="toggleRuler()">{{showRuler ? 'Hide Ruler' : 'Show Ruler'}} <font-awesome-icon icon="ruler" /></button>
+      <button class="btn" @click="toggleGrid()">{{showGrid ? 'Hide Grid' : 'Show Grid'}} <font-awesome-icon icon="th-large" /></button>
+      <button class="btn" v-if="showGrid" @click="toggleRuler()">{{showRuler ? 'Hide Ruler' : 'Show Ruler'}} <font-awesome-icon icon="ruler" /></button>
     </div>
     <textarea v-if="generatedArt" v-model="generatedArt">
     </textarea>
@@ -83,7 +85,8 @@ export default {
       'addColor',
       'pickedColor',
       'generateArt',
-      'eraser'
+      'eraser',
+      'undo'
     ]),
     generateList() {
       const list = [];
@@ -97,21 +100,23 @@ export default {
           color: "transparent"
         });
       }
-      this.setUpdatedList(list)
+      this.setUpdatedList({ list: list, first: true })
     },
     updateTiles(e) {
       const newList = this.updatedList.map(item => {
+        let newItem = null;
         if (item.id === e.id) {
+          newItem = Object.assign({}, item);
           if(this.isEraser){
-            item.color = "transparent";
+            newItem.color = "transparent";
           }
           else{
-            item.color = this.currentColor.value;
+            newItem.color = this.currentColor.value;
           }
         }
-        return item;
+        return newItem ? newItem : item;
       });
-      this.setUpdatedList(newList);
+      this.setUpdatedList({ list: newList, first: false, pressed: e.pressed });
     },
     setColor(color){
       this.addColor(color);
