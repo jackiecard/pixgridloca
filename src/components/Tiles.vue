@@ -1,18 +1,20 @@
 <template>
-  <ul :class="['tiles', {'tiles--grid' : showGrid}, {'tiles--ruler' : showRuler}]" :style="canvasStyle">
-    <li v-for="(tile, i) in list" :key="i" 
-      :style="{backgroundColor: tile.color}"
-       @mousedown.prevent="clicked(tile.id)"
-       @mouseup.prevent="release(tile.id)"
-       @mouseover.prevent="over(tile.id)"
-       :class="[{'first-row' : i < canvasWidth}, {'first-column' : i % canvasWidth === 0}]">
-      <div class="tile__info">
-        <div class="tile__info__x">{{tile.xs + 1}}</div>
-        <div class="tile__info__y">{{tile.ys + 1}}</div> 
-        <div class="tile__info__xy">1</div>
-      </div>
-    </li>
-  </ul>
+  <div class="tiles-wrapper">
+    <ul :class="['tiles', {'tiles--grid' : showGrid}, {'tiles--ruler' : showRuler}]" :style="canvasStyle">
+      <li v-for="(tile, i) in list" :key="i" 
+        :style="{backgroundColor: tile.color}"
+        @mousedown.prevent="clicked(tile.id)"
+        @mouseup.prevent="release(tile.id)"
+        @mouseover.prevent="over(tile.id)"
+        :class="[{'first-row' : i < canvasWidth}, {'first-column' : i % canvasWidth === 0}]">
+        <div class="tile__info">
+          <div class="tile__info__x">{{tile.xs + 1}}</div>
+          <div class="tile__info__y">{{tile.ys + 1}}</div> 
+          <div class="tile__info__xy">1</div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
@@ -81,7 +83,14 @@ export default {
   padding: 0;
 
   --border-color: rgba(0, 0, 0, 0.1);
+  --border-color-light: rgba(255, 255, 255, 0.1);
   --border-size: 2px;
+
+  &-wrapper{
+    width: 85%;
+    background-color: #dadada;
+    overflow-x: auto;
+  }
 
   li{
     list-style-type: none;
@@ -96,6 +105,16 @@ export default {
 
   &--grid{
     border-left: var(--border-size) dashed var(--border-color);
+    position: relative;
+    &:before{
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border-left: var(--border-size) dashed var(--border-color-light);
+    }
 
     &.tiles--ruler{
       li{
@@ -112,9 +131,22 @@ export default {
       border-bottom: var(--border-size) dashed var(--border-color);
       border-right: var(--border-size) dashed var(--border-color);
 
+      position: relative;
+      &:before{
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        border-bottom: var(--border-size) dashed var(--border-color-light);
+        border-right: var(--border-size) dashed var(--border-color-light);
+      }
+
       &.first-row{
         position: relative;
         border-top: var(--border-size) dashed var(--border-color);
+        position: relative;
 
         .tile__info{
           position: absolute;    

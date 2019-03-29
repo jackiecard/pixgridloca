@@ -1,10 +1,12 @@
 <template>
   <ul class="color-palette">
     <div class="color-palette__bg">
-      <div class="color-palette__bg__tile" v-for="i in 30" :key="i"></div>
+      <div class="color-palette__bg__tile" v-for="i in 32" :key="i"></div>
     </div>
-    <li v-for="(tile, i) in paletteList" :key="i" :style="{backgroundColor: tile.value}" @click="pickedColor(tile)">
-      <!-- {{tile}} -->
+    <li v-for="(tile, i) in paletteList" :key="i" @click="pickedColor(tile)">
+      <button :style="{backgroundColor: tile.value}">
+        <span v-if="tile.name">{{tile.name}}</span>
+      </button>
     </li>
   </ul>
 </template>
@@ -28,23 +30,21 @@ export default {
 
 <style lang="scss" scoped>
 .color-palette{
-  --border-color: rgb(174, 174, 174);
-
   position: relative;
   display: grid;
-  grid-template-columns: repeat(40, 30px);
+  grid-template-columns: repeat(16, 30px);
   grid-template-rows: repeat(2, 30px);
   margin: 0;
   padding: 0;    
-  height: 74px;
-  max-width: 457px;
+  height: 63px;
+  max-width: 482px;
   overflow-y: auto;
 
   &__bg{
     max-width: 800px;
     position: absolute;
     display: grid;
-    grid-template-columns: repeat(15, 30px);
+    grid-template-columns: repeat(16, 30px);
     grid-template-rows: repeat(2, 30px);
     z-index: 0;
 
@@ -65,5 +65,17 @@ export default {
   width: 28px;
   height: 28px;
   padding: 0;
+
+  button{
+    width: 100%;
+    height: 100%;
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    span{
+      font-size: 0;
+    }
+  }
 }
 </style>

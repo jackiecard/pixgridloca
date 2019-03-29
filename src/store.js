@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-// import VuexPersist from "vuex-persist";
+import VuexPersist from "vuex-persist";
 
 Vue.use(Vuex);
 
@@ -189,15 +189,15 @@ const getters = {
   backupList: state => state.backupList
 };
 
-// const vuexPersist = new VuexPersist({
-//   key: "my-app",
-//   storage: localStorage
-// });
+const vuexPersist = new VuexPersist({
+  key: "my-app",
+  storage: localStorage
+});
 
 export default new Vuex.Store({
   state,
   getters,
   actions,
   mutations,
-  // plugins: [vuexPersist.plugin]
+  plugins: [vuexPersist.plugin]
 });

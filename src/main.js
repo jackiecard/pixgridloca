@@ -3,10 +3,9 @@ import store from "./store";
 import { library, config } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-import Popover from "vue-js-popover";
 import { Sketch } from "vue-color";
-
-Vue.use(Popover);
+import Popper from "vue-popperjs";
+import "vue-popperjs/dist/vue-popper.css";
 
 config.autoAddCss = false;
 
@@ -14,6 +13,7 @@ library.add(fas);
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 Vue.component('sketch-picker', Sketch);
+Vue.component("popper", Popper);
 
 import App from "./App.vue";
 import Editor from "./components/Editor.vue";

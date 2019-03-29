@@ -1,6 +1,14 @@
 <template>
   <div id="app">
+    <Header>
+      <template slot="logo">
+        <font-awesome-icon icon="heart" /> Pixel Grid Editor
+      </template>
+    </Header>
     <Editor/>
+    <footer>
+      Made with <font-awesome-icon icon="heart" /> by <a href="https://github.com/jackiecard" title="Jackie's github page">jackiecard</a>.
+    </footer>
   </div>
 </template>
 
@@ -17,12 +25,12 @@ export default {
 
 body{
   margin: 0;
-  background-color: #ccc;
+  background-color: #dadada;
 }
 
 #app {
-  --border-color: rgba(0, 0, 0, 0.1);
-  --border-color-active: #f1d963;
+  --border-color: rgba(0, 0, 0, 0.05);
+  --border-color-active: #ffffff;
 
   font-family: 'Inconsolata', monospace;
   -webkit-font-smoothing: antialiased;
@@ -33,6 +41,23 @@ body{
   button,
   input{
     font-family: 'Inconsolata', monospace;
+  }
+
+  .popper[x-placement^="bottom"] .popper__arrow {
+    border-color: transparent transparent #eaeaea transparent;
+  }
+
+  .popper[x-placement^="right"] .popper__arrow {
+    border-color: transparent #eaeaea transparent transparent;
+  }
+
+  footer{
+    padding: 20px 0 50px;
+
+    .svg-inline--fa{
+      height: 12px;
+      margin-bottom: -1px;
+    }
   }
 }
 </style>

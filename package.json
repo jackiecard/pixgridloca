@@ -16,7 +16,7 @@
     "npm": "^6.9.0",
     "vue": "^2.6.6",
     "vue-color": "^2.7.0",
-    "vue-js-popover": "^1.1.8",
+    "vue-popperjs": "^2.0.3",
     "vuex": "^2.5.0",
     "vuex-persist": "^2.0.0",
     "vuex-router-sync": "^3.0.0"
