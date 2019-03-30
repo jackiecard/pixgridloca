@@ -21,6 +21,7 @@ function generateList() {
 }
 
 const state = {
+  projectName: 'Awesome Pixel Grid',
   generatedArt: null,
   updatedList: [],
   backupList: [],
@@ -33,6 +34,7 @@ const state = {
   newColor: "",
   bouncePickedColor: false,
   isEraser: false,
+  save: {},
   currentColor: {
     id: "c2",
     value: "black"
@@ -126,15 +128,13 @@ const mutations = {
           listLines.push(line);
         }
         return curr;
-      }
-      else if(prev.ys !== curr.ys){
+      } else if (prev.ys !== curr.ys) {
         if (listLines.indexOf(line) < 0) {
           line.xe = prev.xs;
           listLines.push(line);
         }
         return curr;
-      }
-      else{
+      } else {
         line.xe = curr.xs;
         if (listLines.indexOf(line) < 0) {
           listLines.push(line);
@@ -143,16 +143,21 @@ const mutations = {
       return line;
     });
 
-    console.log("a line", listLines);
-
     let list = "";
     listLines.forEach(item => {
       if (item.color !== "transparent") {
-        list += `<div class="pixgrid__pixel" id="${item.id}" style="background-color: ${item.color}; grid-area: ${item.ys + 1} / ${item.xs + 1} / ${item.ys +2} / ${item.xe + 2}"></div>`;
+        list += `<div class="pixgrid__pixel" id="${
+          item.id
+        }" style="background-color: ${item.color}; grid-area: ${item.ys +
+          1} / ${item.xs + 1} / ${item.ys + 2} / ${item.xe + 2}"></div>`;
       }
     });
     const html = `
-      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${state.canvasWidth}, ${state.tileSize}px); grid-template-rows: repeat(${state.canvasHeight}, ${state.tileSize}px);">${list}</div>
+      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${
+        state.canvasWidth
+      }, ${state.tileSize}px); grid-template-rows: repeat(${
+      state.canvasHeight
+    }, ${state.tileSize}px);">${list}</div>
     `;
     state.generatedArt = html;
   },
@@ -179,6 +184,18 @@ const mutations = {
   },
   setTileSize(state, payload) {
     state.tileSize = payload;
+  },
+  setProjectName(state, payload) {
+    state.projectName = payload;
+  },
+  saveState(state) {
+    state.save = {
+      projectName: state.projectName,
+      canvasWidth: state.canvasWidth,
+      canvasHeight: state.canvasHeight,
+      tileSize: state.tileSize,
+      updatedList: state.updatedList
+    }
   }
 };
 
@@ -222,7 +239,19 @@ const actions = {
   undo: ({ commit }) => commit("undo"),
   setCanvasWidth: ({ commit }, payload) => commit("setCanvasWidth", payload),
   setCanvasHeight: ({ commit }, payload) => commit("setCanvasHeight", payload),
-  setTileSize: ({ commit }, payload) => commit("setTileSize", payload)
+  setTileSize: ({ commit }, payload) => commit("setTileSize", payload),
+  setProjectName: ({ commit }, payload) => commit("setProjectName", payload),
+  saveState: ({ commit }) => commit("saveState"),
+  import: ({ commit }, payload) => {
+    const obj = JSON.parse(payload);
+    commit("setUpdatedList", { list: obj.updatedList, first: true });
+    commit("setCanvasWidth", obj.canvasWidth);
+    commit("setCanvasHeight", obj.canvasHeight);
+    commit("setTileSize", obj.tileSize);
+    commit("setProjectName", obj.projectName);
+    commit("generateArt", { clear: true });
+    
+  }
 };
 
 const getters = {
@@ -240,7 +269,9 @@ const getters = {
   bouncePickedColor: state => state.bouncePickedColor,
   isEraser: state => state.isEraser,
   backupList: state => state.backupList,
-  cleanList: state => state.cleanList
+  cleanList: state => state.cleanList,
+  save: state => state.save,
+  projectName: state => state.projectName
 };
 
 // const vuexPersist = new VuexPersist({

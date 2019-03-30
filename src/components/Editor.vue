@@ -19,7 +19,7 @@
               <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
                 <span class="current-color__doubled">Already here!</span>
               </div>
-              <span class="tip">A</span>
+              <span class="tip">1</span>
             </button>
           </popper>
         </div>
@@ -28,11 +28,11 @@
       <template slot="control">
         <button :class="['btn btn--control', {'btn--active': isEraser}]" @click="eraser(true)">
           Eraser <font-awesome-icon icon="eraser" />
-          <span class="tip">E</span>
+          <span class="tip">2</span>
         </button>
         <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">
           Pencil <font-awesome-icon icon="pen" />
-          <span class="tip">P</span>
+          <span class="tip">3</span>
         </button>
 
         <popper
@@ -45,7 +45,7 @@
                   id="zoom-in">
                   Zoom In 
                   <font-awesome-icon icon="search-plus" />
-                  <span class="tip">+</span>
+                  <span class="tip">=</span>
                 </button>
                 <button :class="['btn btn--control', {'btn--disabled': zoom === 1/ this.tileSize}]" 
                   @click="zoomOut()"
@@ -65,18 +65,18 @@
             </div>
             <button slot="reference" class="btn btn--control" id="zoom">
               Zoom <font-awesome-icon icon="search" />
-              <span class="tip">Z</span>
+              <span class="tip">4</span>
             </button>
         </popper> 
 
         <button class="btn btn--control" @click="undo()">
           Undo <font-awesome-icon icon="undo" />
-          <span class="tip">U</span>
+          <span class="tip">5</span>
         </button>
         
-        <button class="btn btn--control" @click="showModal = true">
+        <button class="btn btn--control" @click="showModal = true" id="clean">
           Clean <font-awesome-icon icon="times" />
-          <span class="tip">X</span>
+          <span class="tip">6</span>
         </button>
 
         <modal v-if="showModal" @quit="showModal = false" @accept="showModal = false, setList()">
@@ -89,19 +89,59 @@
             :options="{ placement: 'bottom' }">
             <div class="popper">
               <div class="settings">
+                <label for="project-name">Project Name</label>
+                <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
                 <label for="canvas-width">Canvas Width</label>
-                <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width"/>
+                <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
                 <label for="canvas-height">Canvas Height</label>
-                <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height"/>
+                <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
                 <label for="tile-size">Tile Size</label>
-                <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size"/>
+                <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
               </div>
-
               <button class="btn btn--primary" @click="setNewConfig">Ok!</button>
             </div>
             <button slot="reference" class="btn btn--control" id="settings">
               Settings <font-awesome-icon icon="cog" />
-              <span class="tip">S</span>
+              <span class="tip">7</span>
+            </button>
+        </popper> 
+
+
+        <popper
+            trigger="click"
+            :options="{ placement: 'bottom' }">
+            <div class="popper">
+              <div class="save-settings">
+                <h3>Save it for later</h3>
+                <textarea class="generated-art-field" 
+                  v-if="save" 
+                  @click="copyContent(true)" 
+                  ref="saveTextarea">{{this.save}}</textarea>
+                <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+              </div>
+            </div>
+            <button slot="reference" class="btn btn--control" @click="saveState()" id="save-btn">
+              Save <font-awesome-icon icon="save" />
+              <span class="tip">8</span>
+            </button>
+        </popper> 
+
+
+        <popper
+            trigger="click"
+            :options="{ placement: 'bottom' }">
+            <div class="popper">
+              <div class="save-settings">
+                <h3>Import project</h3>
+                <textarea class="generated-art-field" 
+                  v-if="save" 
+                  v-model="importedProject"></textarea>
+              </div>
+              <button class="btn btn--primary" @click="importProject">Ok!</button>
+            </div>
+            <button slot="reference" class="btn btn--control" id="import-btn">
+              Import <font-awesome-icon icon="upload" />
+              <span class="tip">9</span>
             </button>
         </popper> 
 
@@ -109,7 +149,7 @@
             trigger="click"
             :options="{ placement: 'top' }">
             <div class="popper">
-              <h3>Build</h3>
+              <h3>Make it HTML</h3>
               <textarea class="generated-art-field" 
                 v-if="generatedArt" 
                 @click="copyContent()" 
@@ -117,20 +157,10 @@
               <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
             </div>
             <button slot="reference" class="btn btn--control" @click="generateArt()" id="export">
-              Build <font-awesome-icon icon="plus-circle" />
-              <span class="tip">B</span>
+              Make <font-awesome-icon icon="plus-circle" />
+              <span class="tip">0</span>
             </button>
         </popper>
-
-        <button class="btn btn--control" @click="toggleGrid()">
-          {{showGrid ? 'Hide Grid' : 'Show Grid'}} <font-awesome-icon icon="th-large" />
-          <span class="tip">G</span>
-        </button>
-        <button class="btn btn--control" v-if="showGrid" @click="toggleRuler()">
-          {{showRuler ? 'Hide Ruler' : 'Show Ruler'}} <font-awesome-icon icon="ruler" />
-          <span class="tip">R</span>
-        </button>
-
       </template>
     </Toolbar>
 
@@ -140,7 +170,16 @@
            :tile-size="tileSize * zoom" 
            :show-grid="showGrid"
            :show-ruler="showRuler"
-           @update-tiles="updateTiles"/>
+           @update-tiles="updateTiles">
+      <button :class="['btn', {'btn--hide': !showGrid}]" @click="toggleGrid()">
+        {{showGrid ? 'Hide Grid' : 'Show Grid'}} 
+        <font-awesome-icon icon="th-large" />
+      </button>
+      <button :class="['btn', {'btn--hide': !showRuler}]" v-if="showGrid" @click="toggleRuler()">
+        {{showRuler ? 'Hide Ruler' : 'Show Ruler'}} 
+        <font-awesome-icon icon="ruler" />
+      </button>
+    </Tiles>
   </div>
 </template>
 
@@ -155,8 +194,10 @@ export default {
       newCanvasWidth: 8,
       newCanvasHeight: 8,
       newTileSize: 10,
+      newProjectName: '',
       showCopiedTip: false,
-      showModal: false
+      showModal: false,
+      importedProject: ''
     }
   },
   computed: mapGetters([
@@ -171,13 +212,16 @@ export default {
     'currentColor',
     'generatedArt',
     'bouncePickedColor',
-    'isEraser'
+    'isEraser',
+    'save',
+    'projectName'
   ]),
   mounted(){
     if(!this.updatedList || this.updatedList.length <= 0){
       this.setList();
     }
     this.bindKeyEvents();
+    this.newProjectName = this.projectName;
     this.newCanvasWidth = this.canvasWidth;
     this.newCanvasHeight = this.canvasHeight;
     this.newTileSize = this.tileSize;
@@ -198,12 +242,19 @@ export default {
       'setCanvasWidth',
       'setCanvasHeight',
       'setTileSize',
-      'setList'
+      'setProjectName',
+      'setList',
+      'saveState',
+      'import'
     ]),
+    importProject() {
+      this.import(this.importedProject)
+    },
     setNewConfig() {
       this.setCanvasWidth(Number(this.newCanvasWidth))
       this.setCanvasHeight(Number(this.newCanvasHeight))
       this.setTileSize(Number(this.newTileSize))
+      this.setProjectName(Number(this.newProjectName))
       this.setList()
     },
     updateTiles(e) {
@@ -226,8 +277,11 @@ export default {
       this.addColor(color);
       this.newColor = "";
     },
-    copyContent(){
-      const textarea = this.$refs.buildTextarea;
+    copyContent(save){
+      let textarea = this.$refs.buildTextarea;
+      if(save) {
+        textarea = this.$refs.saveTextarea;
+      }
       textarea.select();
       document.execCommand("copy");
       this.showCopiedTip = true;
@@ -236,83 +290,85 @@ export default {
       }, 3000);
     },
     bindKeyEvents() {
-      document.addEventListener('keydown', (event) => {
-        const keyName = event.key;
-
+      document.addEventListener('keydown', (e) => {
+        const key = e.ctrlKey;
         // focus palette
-        if(keyName.toLowerCase() === 'c'){
+        if(key && e.key.toLowerCase() === 'p'){
           const palette = document.querySelector('#palette > li > button');
           palette.focus();
         }
 
+        // color picker
+        if(key && e.key.toLowerCase() === '1'){
+          const colorPickerBtn = document.querySelector('#colorPicker');
+          colorPickerBtn.click();
+        }
+
         // eraser
-        if(keyName.toLowerCase() === 'e'){
+        if(key && e.key.toLowerCase() === '2'){
           this.eraser(true);
         }
 
         // pencil
-        if(keyName.toLowerCase() === 'p'){
+        if(key && e.key.toLowerCase() === '3'){
           this.eraser(false);
         }
 
-        // undo
-        if(keyName.toLowerCase() === 'u'){
-          this.undo();
-        }
-
-        // clean
-        if(keyName.toLowerCase() === 'x'){
-          this.generateList();
-        }
-
-        // toggle grid
-        if(keyName.toLowerCase() === 'g'){
-          this.toggleGrid();
-        }
-
-        // toggle ruler
-        if(keyName.toLowerCase() === 'r'){
-          this.toggleRuler();
-        }
-
         // zoom options
-        if(keyName.toLowerCase() === 'z'){
+        if(key && e.key.toLowerCase() === '4'){
           const zoomBtn = document.querySelector('#zoom');
           zoomBtn.click();
         }
 
         //zoom in
-        if(keyName.toLowerCase() === '+'){
+        if(key && e.key.toLowerCase() === '='){
           const zoomBtn = document.querySelector('#zoom-in');
           zoomBtn.click();
         }
 
         //zoom out
-        if(keyName.toLowerCase() === '-'){
+        if(key && e.key.toLowerCase() === '-'){
           const zoomBtn = document.querySelector('#zoom-out');
           zoomBtn.click();
         }
 
         //zoom reset
-        if(keyName.toLowerCase() === ']'){
+        if(key && e.key.toLowerCase() === ']'){
           const zoomBtn = document.querySelector('#zoom-reset');
           zoomBtn.click();
         }
 
-        // color picker
-        if(keyName.toLowerCase() === 'a'){
-          const colorPickerBtn = document.querySelector('#colorPicker');
-          colorPickerBtn.click();
+        // undo
+        if(key && e.key.toLowerCase() === '5'){
+          this.undo();
+        }
+
+        // clean
+        if(key && e.key.toLowerCase() === '6'){
+          const cleanBtn = document.querySelector('#clean');
+          cleanBtn.click();
         }
 
         // settings
-        if(keyName.toLowerCase() === 's'){
+        if(key && e.key.toLowerCase() === '7'){
           const settingsBtn = document.querySelector('#settings');
           settingsBtn.click();
         }
 
+        // save
+        if(key && e.key.toLowerCase() === '8'){
+          const saveBtn = document.querySelector('#save-btn');
+          saveBtn.click();
+        }
+
+        // import
+        if(key && e.key.toLowerCase() === '9'){
+          const importBtn = document.querySelector('#import-btn');
+          importBtn.click();
+        }
+
         // build
-        if(keyName.toLowerCase() === 'b'){
+        if(key && e.key.toLowerCase() === '0'){
           const exportBtn = document.querySelector('#export');
           exportBtn.click();
         }
@@ -483,7 +539,11 @@ export default {
   }
 
   input{
-    max-width: 50px;
+    max-width: 200px;
+
+    &.small-input{
+      max-width: 50px;
+    }
   }
 }
 

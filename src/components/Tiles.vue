@@ -13,6 +13,9 @@
           <div class="tile__info__xy">1</div>
         </div>
       </li>
+      <div class="tiles__tools">
+        <slot/>
+      </div>
     </ul>
   </div>
 </template>
@@ -78,8 +81,9 @@ export default {
 
 <style lang="scss" scoped>
 .tiles{
+  position: relative;
   display: grid;
-  margin: 30px;
+  margin: 30px 30px 40px 30px;
   padding: 0;
 
   --border-color: rgba(0, 0, 0, 0.1);
@@ -182,6 +186,31 @@ export default {
               display: block;
             }
           }
+        }
+      }
+    }
+  }
+
+  &__tools{
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+
+    .btn{
+      position: relative;
+      min-width: auto;
+      min-height: auto;
+      padding: 5px;
+      font-size: 0;
+
+      .svg-inline--fa{
+        height: 12px;
+        padding: 0;
+      }
+
+      &--hide{
+        .svg-inline--fa{
+          color: rgba(0, 0, 0, 0.42);
         }
       }
     }
