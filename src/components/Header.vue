@@ -1,7 +1,7 @@
 <template>
   <header>
-    <div class="logo">
-      <slot name="logo"/>
+    <div class="brand">
+      <slot name="brand"/>
     </div>
   </header>
 </template>
@@ -17,19 +17,25 @@ header{
   max-height: 60px;
   background-color: #272727;
   color: #dadada;
-  padding: 10px 20px;
+  padding: 15px 20px;
   text-align: left;
   
-  .logo{
+  .brand{
+    display: flex;
     font-weight: bold;
-    font-family: 'Comfortaa', cursive;
     line-height: 30px;
 
-    .svg-inline--fa{
-      height: 20px;
-      color: #ad6363;
-      margin-bottom: -3px;
+    &__logo{
       padding-right: 10px;
+    }
+
+    span{
+      line-height: 20px;
+
+      sup{
+        font-weight: 100;
+        font-size: .5%;
+      }
     }
   }
 }

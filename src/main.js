@@ -21,14 +21,17 @@ import Tiles from "./components/Tiles.vue";
 import ColorPalette from "./components/ColorPalette.vue";
 import Header from "./components/Header.vue";
 import Toolbar from "./components/Toolbar.vue";
+import Modal from "./components/Modal.vue";
 
 Vue.component("Editor", Editor);
 Vue.component("Tiles", Tiles);
 Vue.component("ColorPalette", ColorPalette);
 Vue.component("Header", Header);
 Vue.component("Toolbar", Toolbar);
+Vue.component("Modal", Modal);
 
-Vue.config.productionTip = false
+Vue.config.productionTip = true
+Vue.config.devtools = true;
 
 new Vue({
   store,

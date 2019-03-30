@@ -1,19 +1,35 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import VuexPersist from "vuex-persist";
+// import VuexPersist from "vuex-persist";
 
 Vue.use(Vuex);
+
+function generateList() {
+  const list = [];
+  const size = state.canvasWidth * state.canvasHeight;
+
+  for (let i = 0; i < size; i++) {
+    list.push({
+      id: "p" + i,
+      xs: i % state.canvasWidth,
+      ys: (i - (i % state.canvasWidth)) / state.canvasWidth,
+      color: "transparent"
+    });
+  }
+
+  return list;
+}
 
 const state = {
   generatedArt: null,
   updatedList: [],
   backupList: [],
-  canvasWidth: 20,
-  canvasHeight: 15,
+  canvasWidth: 4,
+  canvasHeight: 4,
   showGrid: true,
   showRuler: true,
   zoom: 1,
-  tileSize: 50,
+  tileSize: 40,
   newColor: "",
   bouncePickedColor: false,
   isEraser: false,
@@ -70,7 +86,10 @@ const mutations = {
   },
   zoomOut(state) {
     const percentage = 0.25;
-    state.zoom = state.zoom - percentage >= 0.1 ? state.zoom - percentage : 1 / state.tileSize;
+    state.zoom =
+      state.zoom - percentage >= 0.1
+        ? state.zoom - percentage
+        : 1 / state.tileSize;
   },
   zoomReset(state) {
     state.zoom = 1;
@@ -85,37 +104,55 @@ const mutations = {
     state.currentColor = payload;
   },
   setUpdatedList(state, payload) {
-    if(payload.first) {
+    if (payload.first) {
       state.backupList = payload.list;
-    }
-    else if(!payload.pressed) {
+    } else if (!payload.pressed) {
       state.backupList = state.updatedList;
     }
     state.updatedList = payload.list;
   },
   generateArt(state, payload) {
-    if(payload && payload.clear) {
+    if (payload && payload.clear) {
       state.generatedArt = null;
       return;
     }
 
+    const listLines = [];
+    state.updatedList.reduce((prev, curr) => {
+      let line = prev;
+      if (prev.color !== curr.color) {
+        if (listLines.indexOf(line) < 0) {
+          line.xe = prev.xs;
+          listLines.push(line);
+        }
+        return curr;
+      }
+      else if(prev.ys !== curr.ys){
+        if (listLines.indexOf(line) < 0) {
+          line.xe = prev.xs;
+          listLines.push(line);
+        }
+        return curr;
+      }
+      else{
+        line.xe = curr.xs;
+        if (listLines.indexOf(line) < 0) {
+          listLines.push(line);
+        }
+      }
+      return line;
+    });
+
+    console.log("a line", listLines);
+
     let list = "";
-    state.updatedList.forEach(item => {
+    listLines.forEach(item => {
       if (item.color !== "transparent") {
-        list += `<div class="pixel" id="${item.id}" style="background-color: ${
-          item.color
-        }; grid-area: ${item.ys + 1} / ${item.xs + 1} / ${item.ys +
-          2} / ${item.xs + 2}"></div>`;
+        list += `<div class="pixgrid__pixel" id="${item.id}" style="background-color: ${item.color}; grid-area: ${item.ys + 1} / ${item.xs + 1} / ${item.ys +2} / ${item.xe + 2}"></div>`;
       }
     });
     const html = `
-      <div class="art" style="display: grid; grid-template-columns: repeat(${
-        state.canvasWidth
-      }, ${state.tileSize}px); grid-template-rows: repeat(${
-      state.canvasHeight
-    }, ${state.tileSize}px);">
-        ${list}
-      </div>
+      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${state.canvasWidth}, ${state.tileSize}px); grid-template-rows: repeat(${state.canvasHeight}, ${state.tileSize}px);">${list}</div>
     `;
     state.generatedArt = html;
   },
@@ -129,17 +166,30 @@ const mutations = {
   eraser(state, payload) {
     state.isEraser = payload;
   },
-  undo(state){
+  undo(state) {
     const backup = state.updatedList;
     state.updatedList = state.backupList;
     state.backupList = backup;
+  },
+  setCanvasWidth(state, payload) {
+    state.canvasWidth = payload;
+  },
+  setCanvasHeight(state, payload) {
+    state.canvasHeight = payload;
+  },
+  setTileSize(state, payload) {
+    state.tileSize = payload;
   }
 };
 
 const actions = {
   setUpdatedList: ({ commit }, payload) => {
     commit("setUpdatedList", payload);
-    commit("generateArt", {clear: true}); 
+    commit("generateArt", { clear: true });
+  },
+  setList: ({ commit }) => {
+    commit("setUpdatedList", { list: generateList(), first: true });
+    commit("generateArt", { clear: true });
   },
   toggleGrid: ({ commit }) => commit("toggleGrid"),
   toggleRuler: ({ commit }) => commit("toggleRuler"),
@@ -169,7 +219,10 @@ const actions = {
   },
   generateArt: ({ commit }, payload) => commit("generateArt", payload),
   eraser: ({ commit }, payload) => commit("eraser", payload),
-  undo: ({ commit }) => commit("undo")
+  undo: ({ commit }) => commit("undo"),
+  setCanvasWidth: ({ commit }, payload) => commit("setCanvasWidth", payload),
+  setCanvasHeight: ({ commit }, payload) => commit("setCanvasHeight", payload),
+  setTileSize: ({ commit }, payload) => commit("setTileSize", payload)
 };
 
 const getters = {
@@ -186,18 +239,19 @@ const getters = {
   paletteList: state => state.paletteList,
   bouncePickedColor: state => state.bouncePickedColor,
   isEraser: state => state.isEraser,
-  backupList: state => state.backupList
+  backupList: state => state.backupList,
+  cleanList: state => state.cleanList
 };
 
-const vuexPersist = new VuexPersist({
-  key: "my-app",
-  storage: localStorage
-});
+// const vuexPersist = new VuexPersist({
+//   key: "my-app",
+//   storage: localStorage
+// });
 
 export default new Vuex.Store({
   state,
   getters,
   actions,
   mutations,
-  plugins: [vuexPersist.plugin]
+  // plugins: [vuexPersist.plugin]
 });

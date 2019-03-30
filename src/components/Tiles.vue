@@ -4,7 +4,7 @@
       <li v-for="(tile, i) in list" :key="i" 
         :style="{backgroundColor: tile.color}"
         @mousedown.prevent="clicked(tile.id)"
-        @mouseup.prevent="release(tile.id)"
+        @mouseup.prevent="release()"
         @mouseover.prevent="over(tile.id)"
         :class="[{'first-row' : i < canvasWidth}, {'first-column' : i % canvasWidth === 0}]">
         <div class="tile__info">
@@ -64,7 +64,7 @@ export default {
       this.$emit('update-tiles', { id: id, pressed: false });
       this.pressedItemId = id;
     },
-    release(id){
+    release(){
       this.pressedItemId = null;
     },
     over(id){
@@ -87,9 +87,13 @@ export default {
   --border-size: 2px;
 
   &-wrapper{
-    width: 85%;
     background-color: #dadada;
     overflow-x: auto;
+    min-height: calc(100vh - 192px);
+
+    @media (min-width: 800px) {
+      width: 85%;
+    }
   }
 
   li{

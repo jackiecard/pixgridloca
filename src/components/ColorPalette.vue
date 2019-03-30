@@ -32,21 +32,32 @@ export default {
 .color-palette{
   position: relative;
   display: grid;
-  grid-template-columns: repeat(16, 30px);
+  grid-template-columns: repeat(8, 30px);
   grid-template-rows: repeat(2, 30px);
   margin: 0;
   padding: 0;    
   height: 63px;
   max-width: 482px;
-  overflow-y: auto;
+  overflow: hidden;
+
+  @media (min-width: 800px) {
+    grid-template-columns: repeat(16, 30px);
+    grid-template-rows: repeat(2, 30px);
+  }
 
   &__bg{
     max-width: 800px;
     position: absolute;
     display: grid;
-    grid-template-columns: repeat(16, 30px);
+    grid-template-columns: repeat(8, 30px);
     grid-template-rows: repeat(2, 30px);
     z-index: 0;
+
+
+    @media (min-width: 800px) {
+      grid-template-columns: repeat(16, 30px);
+      grid-template-rows: repeat(2, 30px);
+    }
 
     &__tile{
       width: 30px;
@@ -67,6 +78,7 @@ export default {
   padding: 0;
 
   button{
+    cursor: pointer;
     width: 100%;
     height: 100%;
     border: 0;

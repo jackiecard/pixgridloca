@@ -10,62 +10,96 @@
             <div class="popper">
               <div>
                 <sketch-picker v-model="newColor" />
-                <button class="btn" @click="setColor(newColor.hex)">Add Color <font-awesome-icon icon="plus" /></button>
+                <button class="btn btn--primary" @click="setColor(newColor.hex)">Add Color</button>
               </div>
             </div>
-            <button slot="reference" class="btn" id="colorPicker">
+            <button slot="reference" class="btn btn--control" id="colorPicker">
               <span class="hide">Add Color</span> 
               <font-awesome-icon icon="plus" />
               <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
                 <span class="current-color__doubled">Already here!</span>
               </div>
-              <span class="tip">P</span>
+              <span class="tip">A</span>
             </button>
           </popper>
         </div>
       </template>
 
       <template slot="control">
-        <button :class="['btn', {'btn--active': isEraser}]" @click="eraser(true)">
+        <button :class="['btn btn--control', {'btn--active': isEraser}]" @click="eraser(true)">
           Eraser <font-awesome-icon icon="eraser" />
           <span class="tip">E</span>
         </button>
-        <button :class="['btn', {'btn--active': !isEraser}]" @click="eraser(false)">
+        <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">
           Pencil <font-awesome-icon icon="pen" />
-          <span class="tip">B</span>
+          <span class="tip">P</span>
         </button>
 
         <popper
             trigger="click"
             :options="{ placement: 'bottom' }">
             <div class="popper">
-              <button :class="['btn', {'btn--disabled': zoom === 8}]" @click="zoomIn()">Zoom In <font-awesome-icon icon="search-plus" /></button>
-              <button  :class="['btn', {'btn--disabled': zoom === 1/ this.tileSize}]" @click="zoomOut()">Zoom Out <font-awesome-icon icon="search-minus" /></button>
-              <button class="btn" @click="zoomReset()">Reset Zoom <font-awesome-icon icon="search" /></button>
+              <div class="zoom-config">
+                <button :class="['btn btn--control', {'btn--disabled': zoom === 8}]" 
+                  @click="zoomIn()"
+                  id="zoom-in">
+                  Zoom In 
+                  <font-awesome-icon icon="search-plus" />
+                  <span class="tip">+</span>
+                </button>
+                <button :class="['btn btn--control', {'btn--disabled': zoom === 1/ this.tileSize}]" 
+                  @click="zoomOut()"
+                  id="zoom-out">
+                  Zoom Out 
+                  <font-awesome-icon icon="search-minus" />
+                  <span class="tip">-</span>
+                </button>
+                <button class="btn btn--control" 
+                  @click="zoomReset()"
+                  id="zoom-reset">Reset Zoom 
+                  <font-awesome-icon icon="search" />
+                  <span class="tip">]</span>
+                </button>
+              </div>
               <div>Zoom {{zoom*100}}%</div>
             </div>
-            <button slot="reference" class="btn" id="zoom">
+            <button slot="reference" class="btn btn--control" id="zoom">
               Zoom <font-awesome-icon icon="search" />
               <span class="tip">Z</span>
             </button>
         </popper> 
 
-        <button class="btn" @click="undo()">
+        <button class="btn btn--control" @click="undo()">
           Undo <font-awesome-icon icon="undo" />
-          <span class="tip"><font-awesome-icon icon="backspace" /></span>
+          <span class="tip">U</span>
         </button>
-        <button class="btn" @click="generateList()">
+        
+        <button class="btn btn--control" @click="showModal = true">
           Clean <font-awesome-icon icon="times" />
           <span class="tip">X</span>
         </button>
+
+        <modal v-if="showModal" @quit="showModal = false" @accept="showModal = false, setList()">
+          <h3 slot="header">Are you sure?</h3>
+          <p slot="body">This is wipe out all the work done so far.</p>
+        </modal>
 
         <popper
             trigger="click"
             :options="{ placement: 'bottom' }">
             <div class="popper">
-              lala
+              <div class="settings">
+                <label for="canvas-width">Canvas Width</label>
+                <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width"/>
+                <label for="canvas-height">Canvas Height</label>
+                <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height"/>
+                <label for="tile-size">Tile Size</label>
+                <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size"/>
+              </div>
+
+              <button class="btn btn--primary" @click="setNewConfig">Ok!</button>
             </div>
-            <button slot="reference" class="btn" id="settings">
+            <button slot="reference" class="btn btn--control" id="settings">
               Settings <font-awesome-icon icon="cog" />
               <span class="tip">S</span>
             </button>
@@ -76,20 +110,23 @@
             :options="{ placement: 'top' }">
             <div class="popper">
               <h3>Build</h3>
-              <textarea v-if="generatedArt" v-model="generatedArt">
-              </textarea>
+              <textarea class="generated-art-field" 
+                v-if="generatedArt" 
+                @click="copyContent()" 
+                ref="buildTextarea">{{this.generatedArt.trim()}}</textarea>
+              <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
             </div>
-            <button slot="reference" class="btn" @click="generateArt()" id="export">
+            <button slot="reference" class="btn btn--control" @click="generateArt()" id="export">
               Build <font-awesome-icon icon="plus-circle" />
               <span class="tip">B</span>
             </button>
         </popper>
 
-        <button class="btn" @click="toggleGrid()">
+        <button class="btn btn--control" @click="toggleGrid()">
           {{showGrid ? 'Hide Grid' : 'Show Grid'}} <font-awesome-icon icon="th-large" />
           <span class="tip">G</span>
         </button>
-        <button class="btn" v-if="showGrid" @click="toggleRuler()">
+        <button class="btn btn--control" v-if="showGrid" @click="toggleRuler()">
           {{showRuler ? 'Hide Ruler' : 'Show Ruler'}} <font-awesome-icon icon="ruler" />
           <span class="tip">R</span>
         </button>
@@ -114,7 +151,12 @@ export default {
   name: 'Editor',
   data() {
     return {
-      newColor: ''
+      newColor: '',
+      newCanvasWidth: 8,
+      newCanvasHeight: 8,
+      newTileSize: 10,
+      showCopiedTip: false,
+      showModal: false
     }
   },
   computed: mapGetters([
@@ -133,10 +175,12 @@ export default {
   ]),
   mounted(){
     if(!this.updatedList || this.updatedList.length <= 0){
-      this.generateList();
+      this.setList();
     }
-
     this.bindKeyEvents();
+    this.newCanvasWidth = this.canvasWidth;
+    this.newCanvasHeight = this.canvasHeight;
+    this.newTileSize = this.tileSize;
   },
   methods: {
     ...mapActions([
@@ -150,21 +194,17 @@ export default {
       'pickedColor',
       'generateArt',
       'eraser',
-      'undo'
+      'undo',
+      'setCanvasWidth',
+      'setCanvasHeight',
+      'setTileSize',
+      'setList'
     ]),
-    generateList() {
-      const list = [];
-      const size = this.canvasWidth * this.canvasHeight;
-
-      for (let i = 0; i < size; i++) {
-        list.push({
-          id: "p" + i,
-          xs: i % this.canvasWidth,
-          ys: (i - (i % this.canvasWidth)) / this.canvasWidth,
-          color: "transparent"
-        });
-      }
-      this.setUpdatedList({ list: list, first: true })
+    setNewConfig() {
+      this.setCanvasWidth(Number(this.newCanvasWidth))
+      this.setCanvasHeight(Number(this.newCanvasHeight))
+      this.setTileSize(Number(this.newTileSize))
+      this.setList()
     },
     updateTiles(e) {
       const newList = this.updatedList.map(item => {
@@ -186,6 +226,15 @@ export default {
       this.addColor(color);
       this.newColor = "";
     },
+    copyContent(){
+      const textarea = this.$refs.buildTextarea;
+      textarea.select();
+      document.execCommand("copy");
+      this.showCopiedTip = true;
+      setTimeout(() => {
+        this.showCopiedTip = false;
+      }, 3000);
+    },
     bindKeyEvents() {
       document.addEventListener('keydown', (event) => {
         const keyName = event.key;
@@ -193,7 +242,6 @@ export default {
         // focus palette
         if(keyName.toLowerCase() === 'c'){
           const palette = document.querySelector('#palette > li > button');
-          console.log(palette)
           palette.focus();
         }
 
@@ -203,12 +251,12 @@ export default {
         }
 
         // pencil
-        if(keyName.toLowerCase() === 'b'){
+        if(keyName.toLowerCase() === 'p'){
           this.eraser(false);
         }
 
         // undo
-        if(keyName.toLowerCase() === 'backspace'){
+        if(keyName.toLowerCase() === 'u'){
           this.undo();
         }
 
@@ -233,8 +281,26 @@ export default {
           zoomBtn.click();
         }
 
+        //zoom in
+        if(keyName.toLowerCase() === '+'){
+          const zoomBtn = document.querySelector('#zoom-in');
+          zoomBtn.click();
+        }
+
+        //zoom out
+        if(keyName.toLowerCase() === '-'){
+          const zoomBtn = document.querySelector('#zoom-out');
+          zoomBtn.click();
+        }
+
+        //zoom reset
+        if(keyName.toLowerCase() === ']'){
+          const zoomBtn = document.querySelector('#zoom-reset');
+          zoomBtn.click();
+        }
+
         // color picker
-        if(keyName.toLowerCase() === 'p'){
+        if(keyName.toLowerCase() === 'a'){
           const colorPickerBtn = document.querySelector('#colorPicker');
           colorPickerBtn.click();
         }
@@ -250,14 +316,13 @@ export default {
           const exportBtn = document.querySelector('#export');
           exportBtn.click();
         }
-        console.log('keydown event\n\n' + 'key: ' + keyName);
       });
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .current-color{
   position: relative;
   border: 1px solid #000;
@@ -294,54 +359,88 @@ export default {
   }
 }
 
-button{
-  &.btn{
-    position: relative;
+.btn{
+  position: relative;
+  background-color: transparent;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+
+  &--active{
+    &:before{
+      content: "";
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: rgb(214, 125, 125);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+  }
+
+  &--disabled{
+    color: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+  }
+
+  .svg-inline--fa{
+    height: 20px;
+    padding: 5px 0;
+  }
+
+  &--primary{
+    background-color: rgba(255, 255, 255, 0.45098039215686275);
+    min-height: auto;
+    margin: 5px;   
+    padding: 6px 15px;
+    min-width: 100px;
+  }
+
+  &--secondary{
     background-color: transparent;
-    border: 0;
-    padding: 0;
-    margin: 0;
+    min-height: auto;
+    margin: 5px;   
+    padding: 6px 15px;
+    min-width: 100px;
+    background-color: #333333;
+    color: #fff;
+    border-color: transparent;
+  }
+
+  &--control{
     font-size: 9px;
+    position: relative;
+    height: 100%;
+    min-width: 60px;
+    min-height: 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    &:after{
-      content: "";
+    .tip{
+      display: none;
       position: absolute;
-      top: -1px;
-      left: -1px;
-      width: calc(100% - 2px);
-      height: calc(100% - 2px);
-      border: 1px solid var(--border-color);
-    }
+      top: 2px;
+      right: 5px;
+      font-size: 8px;
 
-    &--active{
-      &:before{
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: calc(100% - 6px);
-        height: calc(100% - 6px);
-        border: 2px solid var(--border-color-active);
+      .svg-inline--fa{
+        height: 8px;
+        padding: 0;
       }
-    }
 
-    &--disabled{
-      color: rgba(0, 0, 0, 0.2);
-      pointer-events: none;
-    }
-
-    .svg-inline--fa{
-      height: 20px;
-      padding: 5px 0;
+      @media (min-width: 800px) {
+        display: block;
+      }
     }
   }
 }
 
-.vc-sketch{
+.editor .vc-sketch{
   box-shadow: none;
   background-color: #eaeaea;
 }
@@ -351,5 +450,44 @@ button{
   border-radius: 0;
   background-color: #eaeaea;
   border-color: #eaeaea;
+}
+
+.generated-art-field{
+  width: 300px;
+  min-height: 100px;
+  max-height: 200px;
+  resize: none;
+  background-color: #272727;
+  color: #dadada;
+  font-size: 12px;
+
+  &__copy{
+    text-align: right;
+    opacity: 0;
+    transition: .5s opacity ease-in-out;
+
+    &--show{
+      opacity: 1;
+    }
+  }
+}
+
+.settings{
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  grid-template-rows: auto auto auto;
+
+  label{
+    text-align: left;
+    font-weight: 600;
+  }
+
+  input{
+    max-width: 50px;
+  }
+}
+
+.zoom-config{
+  display: flex;
 }
 </style>

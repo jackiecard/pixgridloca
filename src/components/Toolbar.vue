@@ -29,6 +29,11 @@ nav{
   .palette{
     position: relative;
     display: flex;
+    margin: auto;
+
+    @media (min-width: 800px) {
+      margin: inherit;
+    }
 
     &__info{
       margin-top: 1px;
@@ -38,6 +43,7 @@ nav{
         position: relative;
         height: 100%;
         padding: 5px;
+        min-width: auto;
 
         .tip{
           position: absolute;
@@ -58,27 +64,33 @@ nav{
     }
   }
 
+  &:after{
+    content: '';
+    position: absolute;
+    right: 5px;
+    bottom: 10px;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-left: 4px solid #000000b5;
+    border-bottom: 4px solid transparent;
+  }
+
+  @media (min-width: 800px) {
+    &:after{
+      display: none;
+    }
+  }
 
   .control{
     margin-top: 1px;
     display: flex;
+    overflow-y: scroll;
+    padding-top: 10px;
 
-    .btn{
-      position: relative;
-      height: 100%;
-      min-width: 60px;
-
-      .tip{
-        position: absolute;
-        top: 2px;
-        right: 5px;
-        font-size: 8px;
-
-        .svg-inline--fa{
-          height: 8px;
-          padding: 0;
-        }
-      }
+    @media (min-width: 800px) {
+      overflow-y: inherit;
+      padding-top: 0;
     }
   }
 }
