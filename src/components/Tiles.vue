@@ -92,6 +92,8 @@ export default {
 
   &-wrapper{
     background-color: #dadada;
+    background-image: url('/assets/bg.png');
+    background-repeat: repeat;
     overflow-x: auto;
     min-height: calc(100vh - 192px);
 

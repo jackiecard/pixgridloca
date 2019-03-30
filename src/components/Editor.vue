@@ -10,7 +10,7 @@
             <div class="popper">
               <div>
                 <sketch-picker v-model="newColor" />
-                <button class="btn btn--primary" @click="setColor(newColor.hex)">Add Color</button>
+                <button class="btn btn--primary" @click="setColor(newColor.hex8)">Add Color</button>
               </div>
             </div>
             <button slot="reference" class="btn btn--control" id="colorPicker">
