@@ -3,6 +3,10 @@
     <div class="brand">
       <slot name="brand"/>
     </div>
+
+    <div class="info">
+      <slot name="info"/>
+    </div>
   </header>
 </template>
 
@@ -17,8 +21,10 @@ header{
   max-height: 60px;
   background-color: #272727;
   color: #dadada;
-  padding: 15px 20px;
+  padding: 15px 20px 10px;
   text-align: left;
+  display: flex;
+  justify-content: space-between;
   
   .brand{
     display: flex;
@@ -35,6 +41,17 @@ header{
       sup{
         font-weight: 100;
         font-size: .5%;
+      }
+    }
+  }
+
+  .info{
+    .btn{
+      color: #dadada;
+
+      .svg-inline--fa{
+        height: 12px;
+        margin-bottom: -1px;
       }
     }
   }

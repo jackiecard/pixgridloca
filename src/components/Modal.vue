@@ -55,7 +55,8 @@ export default {
 }
 
 .modal-container {
-  width: 300px;
+  min-width: 300px;
+  max-width: 500px;
   margin: 0px auto;
   padding: 10px 20px;
   background-color: #eaeaea;
@@ -63,6 +64,7 @@ export default {
   box-shadow: rgba(0, 0, 0, 0.25098) 6px 6px 0px -2px;
   transition: all .3s ease;
   font-size: 12px;
+  color: #333;
 }
 
 .modal-header h3 {

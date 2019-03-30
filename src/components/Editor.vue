@@ -28,11 +28,11 @@
       <template slot="control">
         <button :class="['btn btn--control', {'btn--active': isEraser}]" @click="eraser(true)">
           Eraser <font-awesome-icon icon="eraser" />
-          <span class="tip">2</span>
+          <span class="tip">E</span>
         </button>
         <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">
           Pencil <font-awesome-icon icon="pen" />
-          <span class="tip">3</span>
+          <span class="tip">W</span>
         </button>
 
         <popper
@@ -65,18 +65,18 @@
             </div>
             <button slot="reference" class="btn btn--control" id="zoom">
               Zoom <font-awesome-icon icon="search" />
-              <span class="tip">4</span>
+              <span class="tip">2</span>
             </button>
         </popper> 
 
         <button class="btn btn--control" @click="undo()">
           Undo <font-awesome-icon icon="undo" />
-          <span class="tip">5</span>
+          <span class="tip">3</span>
         </button>
         
         <button class="btn btn--control" @click="showModal = true" id="clean">
           Clean <font-awesome-icon icon="times" />
-          <span class="tip">6</span>
+          <span class="tip">4</span>
         </button>
 
         <modal v-if="showModal" @quit="showModal = false" @accept="showModal = false, setList()">
@@ -102,7 +102,7 @@
             </div>
             <button slot="reference" class="btn btn--control" id="settings">
               Settings <font-awesome-icon icon="cog" />
-              <span class="tip">7</span>
+              <span class="tip">5</span>
             </button>
         </popper> 
 
@@ -122,7 +122,7 @@
             </div>
             <button slot="reference" class="btn btn--control" @click="saveState()" id="save-btn">
               Save <font-awesome-icon icon="save" />
-              <span class="tip">8</span>
+              <span class="tip">6</span>
             </button>
         </popper> 
 
@@ -141,7 +141,7 @@
             </div>
             <button slot="reference" class="btn btn--control" id="import-btn">
               Import <font-awesome-icon icon="upload" />
-              <span class="tip">9</span>
+              <span class="tip">7</span>
             </button>
         </popper> 
 
@@ -158,7 +158,7 @@
             </div>
             <button slot="reference" class="btn btn--control" @click="generateArt()" id="export">
               Make <font-awesome-icon icon="plus-circle" />
-              <span class="tip">0</span>
+              <span class="tip">8</span>
             </button>
         </popper>
       </template>
@@ -305,17 +305,17 @@ export default {
         }
 
         // eraser
-        if(key && e.key.toLowerCase() === '2'){
+        if(key && e.key.toLowerCase() === 'e'){
           this.eraser(true);
         }
 
         // pencil
-        if(key && e.key.toLowerCase() === '3'){
+        if(key && e.key.toLowerCase() === 'w'){
           this.eraser(false);
         }
 
         // zoom options
-        if(key && e.key.toLowerCase() === '4'){
+        if(key && e.key.toLowerCase() === '2'){
           const zoomBtn = document.querySelector('#zoom');
           zoomBtn.click();
         }
@@ -339,36 +339,36 @@ export default {
         }
 
         // undo
-        if(key && e.key.toLowerCase() === '5'){
+        if(key && e.key.toLowerCase() === '3'){
           this.undo();
         }
 
         // clean
-        if(key && e.key.toLowerCase() === '6'){
+        if(key && e.key.toLowerCase() === '4'){
           const cleanBtn = document.querySelector('#clean');
           cleanBtn.click();
         }
 
         // settings
-        if(key && e.key.toLowerCase() === '7'){
+        if(key && e.key.toLowerCase() === '5'){
           const settingsBtn = document.querySelector('#settings');
           settingsBtn.click();
         }
 
         // save
-        if(key && e.key.toLowerCase() === '8'){
+        if(key && e.key.toLowerCase() === '6'){
           const saveBtn = document.querySelector('#save-btn');
           saveBtn.click();
         }
 
         // import
-        if(key && e.key.toLowerCase() === '9'){
+        if(key && e.key.toLowerCase() === '7'){
           const importBtn = document.querySelector('#import-btn');
           importBtn.click();
         }
 
         // build
-        if(key && e.key.toLowerCase() === '0'){
+        if(key && e.key.toLowerCase() === '8'){
           const exportBtn = document.querySelector('#export');
           exportBtn.click();
         }

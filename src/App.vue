@@ -7,6 +7,34 @@
         </div>
         <span>PixGrid Editor <sup>Beta</sup></span>
       </template>
+      <template slot="info">
+        <button class="btn" @click="showModal = true">
+          <font-awesome-icon icon="question" />
+        </button>
+
+        <modal v-if="showModal">
+          <h3 slot="header">What is this place?</h3>
+          <div slot="body">
+            <p>PixGrid is a pixel art editor that uses <strong>CSS Grid Layout</strong> to build HTML markup. </p>
+            <p>These code can be pasted in any website or platform that accepts <strong>HTML</strong>.</p>
+            <p>It was created and it's mantained by <a href="https://github.com/jackiecard" title="github page">jackiecard</a>.</p>
+
+            <h3>List of shortcuts</h3>
+            <ul class="shortcuts-list">
+              <li v-for="(item, i) in shortcuts" :key="i" class="shortcuts-list__item">
+                <font-awesome-icon :icon="item.icon" />
+                <span>{{item.name}}</span>
+                <i>ctrl + {{item.val}}</i>
+              </li>
+            </ul>
+          </div>
+          <div slot="footer">
+            <button class="btn btn--primary" @click="showModal = false">
+                OK
+            </button>
+          </div>
+        </modal>
+      </template>
     </Header>
     <Editor/>
     <footer>
@@ -18,7 +46,84 @@
 <script>
 
 export default {
-  name: 'app'
+  name: 'app',
+  data(){
+    return{
+      showModal: false,
+      shortcuts: [
+        {
+          name: 'color pallete',
+          icon: 'palette',
+          val: 'p'
+        },
+        {
+          name: 'color picker',
+          icon: 'tint',
+          val: '1'
+        },
+        {
+          name: 'eraser',
+          icon: 'eraser',
+          val: 'e'
+        },
+        {
+          name: 'pencil',
+          icon: 'pen',
+          val: 'w'
+        },
+        {
+          name: 'zoom',
+          icon: 'search',
+          val: '2'
+        },
+        {
+          name: 'zoom in',
+          icon: 'search-plus',
+          val: '='
+        },
+        {
+          name: 'zoom out',
+          icon: 'search-minus',
+          val: '-'
+        },
+        {
+          name: 'zoom reset',
+          icon: 'search',
+          val: ']'
+        },
+        {
+          name: 'undo',
+          icon: 'undo',
+          val: '3'
+        },
+        {
+          name: 'clean',
+          icon: 'times',
+          val: '4'
+        },
+        {
+          name: 'settings',
+          icon: 'cog',
+          val: '5'
+        },
+        {
+          name: 'save',
+          icon: 'save',
+          val: '6'
+        },
+        {
+          name: 'import',
+          icon: 'upload',
+          val: '7'
+        },
+        {
+          name: 'Make',
+          icon: 'plus-circle',
+          val: '8'
+        },
+      ]
+    }
+  }
 }
 </script>
 
@@ -60,6 +165,33 @@ body{
     .svg-inline--fa{
       height: 12px;
       margin-bottom: -1px;
+    }
+  }
+
+  .shortcuts-list{
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 30px;
+
+    &__item{
+      list-style-type: none;
+      display: grid;
+      grid-template-columns: 20px 1fr 50px;
+
+      .svg-inline--fa{
+        height: 12px;
+        padding-right: 5px;
+      }
+
+      span{
+        text-transform: capitalize;
+      }
+
+      i{
+        text-align: right;
+      }
     }
   }
 }
