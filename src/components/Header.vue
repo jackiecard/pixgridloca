@@ -21,7 +21,7 @@ header{
   max-height: 60px;
   background-color: #272727;
   color: #dadada;
-  padding: 15px 20px 10px;
+  padding: 10px 20px 5px;
   text-align: left;
   display: flex;
   justify-content: space-between;

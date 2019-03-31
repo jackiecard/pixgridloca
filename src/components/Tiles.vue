@@ -1,6 +1,6 @@
 <template>
-  <div class="tiles-wrapper">
-    <ul :class="['tiles', {'tiles--grid' : showGrid}, {'tiles--ruler' : showRuler}]" :style="canvasStyle">
+  <div class="tiles-wrapper tile-background">
+    <ul :class="['tiles ', {'tiles--grid' : showGrid}, {'tiles--ruler' : showRuler}]" :style="canvasStyle">
       <li v-for="(tile, i) in list" :key="i" 
         :style="{backgroundColor: tile.color}"
         @mousedown.prevent="clicked(tile.id)"
@@ -92,7 +92,6 @@ export default {
 
   &-wrapper{
     background-color: #dadada;
-    background-image: url('/assets/bg.png');
     background-repeat: repeat;
     overflow-x: auto;
     min-height: calc(100vh - 192px);

@@ -6,6 +6,10 @@
     <div class="control">
       <slot name="control"/>
     </div>
+
+    <div class="aside">
+      <slot name="aside"/>
+    </div>
   </nav>
 </template>
 
@@ -23,7 +27,7 @@ nav{
   top: 0;
   background-color: #dadada;    
   box-shadow: rgba(0, 0, 0, 0.25098039215686274) 3px 4px 0px -2px;
-  padding: 10px;
+  padding: 10px 10px 5px;
   z-index: 2;
 
   .palette{
@@ -64,33 +68,37 @@ nav{
     }
   }
 
-  &:after{
-    content: '';
-    position: absolute;
-    right: 5px;
-    bottom: 10px;
-    width: 0;
-    height: 0;
-    border-top: 4px solid transparent;
-    border-left: 4px solid #000000b5;
-    border-bottom: 4px solid transparent;
-  }
+  .control{
+    margin-top: 1px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
 
-  @media (min-width: 800px) {
-    &:after{
-      display: none;
+    @media (min-width: 800px) {
+      margin-top: -7px;
+      grid-template-columns: repeat(10, 1fr);
     }
   }
 
-  .control{
-    margin-top: 1px;
-    display: flex;
-    overflow-y: scroll;
-    padding-top: 10px;
+  .aside{
+    height: calc(100vh - 40px);
+    position: absolute;
+    width: 200px;
+    top: 0;
+    right: 0;
+    background: #dadada;
+    border: 1px solid #ccc;
+    box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 0px -2px, rgba(0, 0, 0, 0.25) 0px 0px 1px -1px;
 
-    @media (min-width: 800px) {
-      overflow-y: inherit;
-      padding-top: 0;
+    .layers{
+      overflow-y: auto;
+      height: calc(100% - 33px);
+
+      &__tile{
+        max-width: 200px;
+        margin: 10px;
+        border: 1px solid #ccc;
+        box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.25);
+      }
     }
   }
 }

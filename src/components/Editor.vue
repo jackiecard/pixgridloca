@@ -19,7 +19,6 @@
               <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
                 <span class="current-color__doubled">Already here!</span>
               </div>
-              <span class="tip">1</span>
             </button>
           </popper>
         </div>
@@ -28,11 +27,11 @@
       <template slot="control">
         <button :class="['btn btn--control', {'btn--active': isEraser}]" @click="eraser(true)">
           Eraser <font-awesome-icon icon="eraser" />
-          <span class="tip">E</span>
+          
         </button>
         <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">
           Pencil <font-awesome-icon icon="pen" />
-          <span class="tip">W</span>
+          
         </button>
 
         <popper
@@ -45,38 +44,38 @@
                   id="zoom-in">
                   Zoom In 
                   <font-awesome-icon icon="search-plus" />
-                  <span class="tip">=</span>
+                  
                 </button>
                 <button :class="['btn btn--control', {'btn--disabled': zoom === 1/ this.tileSize}]" 
                   @click="zoomOut()"
                   id="zoom-out">
                   Zoom Out 
                   <font-awesome-icon icon="search-minus" />
-                  <span class="tip">-</span>
+                  
                 </button>
                 <button class="btn btn--control" 
                   @click="zoomReset()"
                   id="zoom-reset">Reset Zoom 
                   <font-awesome-icon icon="search" />
-                  <span class="tip">]</span>
+                  
                 </button>
               </div>
               <div>Zoom {{zoom*100}}%</div>
             </div>
             <button slot="reference" class="btn btn--control" id="zoom">
               Zoom <font-awesome-icon icon="search" />
-              <span class="tip">2</span>
+              
             </button>
         </popper> 
 
         <button class="btn btn--control" @click="undo()">
           Undo <font-awesome-icon icon="undo" />
-          <span class="tip">3</span>
+          
         </button>
         
         <button class="btn btn--control" @click="showModal = true" id="clean">
           Clean <font-awesome-icon icon="times" />
-          <span class="tip">4</span>
+          
         </button>
 
         <modal v-if="showModal" @quit="showModal = false" @accept="showModal = false, setList()">
@@ -102,7 +101,7 @@
             </div>
             <button slot="reference" class="btn btn--control" id="settings">
               Settings <font-awesome-icon icon="cog" />
-              <span class="tip">5</span>
+              
             </button>
         </popper> 
 
@@ -122,7 +121,7 @@
             </div>
             <button slot="reference" class="btn btn--control" @click="saveState()" id="save-btn">
               Save <font-awesome-icon icon="save" />
-              <span class="tip">6</span>
+              
             </button>
         </popper> 
 
@@ -141,7 +140,7 @@
             </div>
             <button slot="reference" class="btn btn--control" id="import-btn">
               Import <font-awesome-icon icon="upload" />
-              <span class="tip">7</span>
+              
             </button>
         </popper> 
 
@@ -158,10 +157,21 @@
             </div>
             <button slot="reference" class="btn btn--control" @click="generateArt()" id="export">
               Make <font-awesome-icon icon="plus-circle" />
-              <span class="tip">8</span>
+              
             </button>
         </popper>
       </template>
+
+      <template slot="aside">
+        <button class="btn" @click="setLayers"><font-awesome-icon icon="plus" /> Add layer</button>
+        <div class="layers">
+          <!-- {{this.layers}} -->
+          <div v-for="(draw,i) in this.layers.code" :key="i" class="layers__tile tile-background">
+            <span v-if="draw" v-html="draw"></span>
+          </div>
+        </div>
+      </template>
+
     </Toolbar>
 
     <Tiles :list="updatedList" 
@@ -180,6 +190,10 @@
         <font-awesome-icon icon="ruler" />
       </button>
     </Tiles>
+
+    <button class="btn" @click="generateSprite">Generate Sprites</button>
+    <div v-if="sprites">{{this.sprites}}</div>
+
   </div>
 </template>
 
@@ -214,7 +228,9 @@ export default {
     'bouncePickedColor',
     'isEraser',
     'save',
-    'projectName'
+    'projectName',
+    'layers',
+    'sprites'
   ]),
   mounted(){
     if(!this.updatedList || this.updatedList.length <= 0){
@@ -239,13 +255,16 @@ export default {
       'generateArt',
       'eraser',
       'undo',
+      'setUpdatedList',
       'setCanvasWidth',
       'setCanvasHeight',
       'setTileSize',
       'setProjectName',
       'setList',
       'saveState',
-      'import'
+      'import',
+      'setLayers',
+      'generateSprite'
     ]),
     importProject() {
       this.import(this.importedProject)
@@ -428,12 +447,16 @@ export default {
     &:before{
       content: "";
       position: absolute;
-      bottom: 10px;
-      right: 10px;
+      bottom: 5px;
+      right: 6px;
       background-color: rgb(214, 125, 125);
       width: 6px;
       height: 6px;
       border-radius: 50%;
+
+      @media (min-width: 800px) {
+        bottom: 20px;
+      }
     }
   }
 
@@ -470,28 +493,17 @@ export default {
     font-size: 9px;
     position: relative;
     height: 100%;
-    min-width: 60px;
-    min-height: 60px;
+    min-width: 40px;
+    min-height: 40px;
+    margin-right: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    .tip{
-      display: none;
-      position: absolute;
-      top: 2px;
-      right: 5px;
-      font-size: 8px;
-
-      .svg-inline--fa{
-        height: 8px;
-        padding: 0;
-      }
-
-      @media (min-width: 800px) {
-        display: block;
-      }
+    .svg-inline--fa{
+      height: 15px;
+      padding: 3px 0;
     }
   }
 }
@@ -549,5 +561,22 @@ export default {
 
 .zoom-config{
   display: flex;
+}
+
+.tile-background{
+  position: relative;
+
+  &:before{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image: url('https://i.imgur.com/FerC2T4.png');
+    opacity: .1;
+  }
 }
 </style>

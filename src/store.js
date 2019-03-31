@@ -20,13 +20,24 @@ function generateList() {
   return list;
 }
 
+// function uuidv4() {
+//   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+//     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+//   )
+// }
+
 const state = {
-  projectName: 'Awesome Pixel Grid',
+  projectName: "Awesome Pixel Grid",
   generatedArt: null,
   updatedList: [],
   backupList: [],
-  canvasWidth: 4,
-  canvasHeight: 4,
+  canvasWidth: 5,
+  canvasHeight: 5,
+  layers: {
+    canvas: [],
+    code: []
+  },
+  sprites: "",
   showGrid: true,
   showRuler: true,
   zoom: 1,
@@ -71,6 +82,10 @@ const state = {
     {
       id: "c8",
       value: "white"
+    },
+    {
+      id: "c9",
+      value: "#E28B8B"
     }
   ]
 };
@@ -152,12 +167,11 @@ const mutations = {
           1} / ${item.xs + 1} / ${item.ys + 2} / ${item.xe + 2}"></div>`;
       }
     });
+    // const html = `
+    //   <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${state.canvasWidth}, ${state.tileSize}px); grid-template-rows: repeat(${state.canvasHeight}, ${state.tileSize}px);">${list}</div>
+    // `;
     const html = `
-      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${
-        state.canvasWidth
-      }, ${state.tileSize}px); grid-template-rows: repeat(${
-      state.canvasHeight
-    }, ${state.tileSize}px);">${list}</div>
+      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${state.canvasWidth}, minmax(1px, ${state.tileSize}px)); grid-template-rows: repeat(${state.canvasHeight}, minmax(1px, ${state.tileSize}px));">${list}</div>
     `;
     state.generatedArt = html;
   },
@@ -195,7 +209,35 @@ const mutations = {
       canvasHeight: state.canvasHeight,
       tileSize: state.tileSize,
       updatedList: state.updatedList
+    };
+  },
+  setLayers(state) {
+    const canvas = state.layers.canvas;
+    const code = state.layers.code;
+    canvas.push(state.updatedList);
+    code.push(state.generatedArt);
+
+    state.layers = {
+      canvas: canvas,
+      code: code
+    };
+  },
+  generateSprite(state){
+    let keyframe = "";
+    const width = state.canvasWidth * state.tileSize;
+    const height = state.canvasHeight * state.tileSize;
+    const size = state.layers.code.length + 1;
+    let acumulatedtMargin = 0;
+
+    for (let i = 0; i < size; i++) { 
+      let margin = (i + 1) === size ? acumulatedtMargin - height: acumulatedtMargin;
+      acumulatedtMargin = acumulatedtMargin + height;
+      keyframe += `${i * (100 / (size - 1))}% {margin-top: -${margin}px;}`;
     }
+
+    const sprites = state.layers.code.join("");
+
+    state.sprites = `<style>@keyframes sprite{${keyframe}}.pixel-grid-animation{overflow: hidden;height: ${width}px;width: ${height}px;} .pixel-grid-animation .pixel-grid-wrapper{animation: sprite 1s steps(1) infinite;}</style><div class="pixel-grid-animation"><div class="pixel-grid-wrapper">${sprites}</div></div>`;
   }
 };
 
@@ -250,8 +292,12 @@ const actions = {
     commit("setTileSize", obj.tileSize);
     commit("setProjectName", obj.projectName);
     commit("generateArt", { clear: true });
-    
-  }
+  },
+  setLayers: ({ commit, state }) => {
+    commit("generateArt", state.updatedList);
+    commit("setLayers")
+  },
+  generateSprite: ({ commit }) => commit("generateSprite"),
 };
 
 const getters = {
@@ -271,7 +317,9 @@ const getters = {
   backupList: state => state.backupList,
   cleanList: state => state.cleanList,
   save: state => state.save,
-  projectName: state => state.projectName
+  projectName: state => state.projectName,
+  layers: state => state.layers,
+  sprites: state => state.sprites
 };
 
 // const vuexPersist = new VuexPersist({

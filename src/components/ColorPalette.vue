@@ -35,7 +35,7 @@ export default {
   grid-template-columns: repeat(8, 30px);
   grid-template-rows: repeat(2, 30px);
   margin: 0;
-  padding: 0;    
+  padding: 0 2px 0 0;
   height: 63px;
   max-width: 482px;
   overflow: hidden;
