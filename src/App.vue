@@ -15,8 +15,8 @@
         <modal v-if="showModal">
           <h3 slot="header">What is this place?</h3>
           <div slot="body">
-            <p>PixGrid is a pixel art editor that uses <strong>CSS Grid Layout</strong> to build HTML markup. </p>
-            <p>These code can be pasted in any website or platform that accepts <strong>HTML</strong> and supports Grid Layout.</p>
+            <p>PixGrid is a pixel art editor that uses <strong>CSS Grid Layout</strong> to build HTML/CSS only animations. </p>
+            <p>These code can be pasted in any website or platform that accepts <strong>HTML</strong> and browsers that support Grid Layout.</p>
             <p>It was created and it's mantained by <a href="https://github.com/jackiecard" title="github page">jackiecard</a>.</p>
 
             <h3>List of shortcuts</h3>
