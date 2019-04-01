@@ -150,14 +150,13 @@
             <div class="popper">
               <h3>Make it HTML</h3>
               <textarea class="generated-art-field" 
-                v-if="generatedArt" 
+                v-if="sprites" 
                 @click="copyContent()" 
-                ref="buildTextarea">{{this.generatedArt.trim()}}</textarea>
+                ref="buildTextarea">{{this.sprites.trim()}}</textarea>
               <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
             </div>
-            <button slot="reference" class="btn btn--control" @click="generateArt()" id="export">
+            <button slot="reference" class="btn btn--control" @click="generateSprite()" id="export">
               Make <font-awesome-icon icon="plus-circle" />
-              
             </button>
         </popper>
       </template>
@@ -166,13 +165,13 @@
         <button class="btn" @click="setLayers"><font-awesome-icon icon="plus" /> Add layer</button>
         <div class="layers">
           <div v-for="(draw,i) in this.layers" :key="i">
-            <button :class="['layers__tile tile-background', {'layers__tile--active': itemIsUpdating === draw.id}]">
-              <span v-if="draw.code" v-html="draw.code"></span>
-            </button>
+            <div :class="['layers__tile tile-background', {'layers__tile--active': itemIsUpdating === draw.id}]">
+              <span v-if="draw.codeForView" v-html="draw.codeForView"></span>
+            </div>
             <div>{{draw.name}}</div>
-            <button v-if="!itemIsUpdating" @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">Update</button>
+            <button class="btn btn--primary" v-if="!itemIsUpdating" @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">Update</button>
             <button v-if="itemIsUpdating === draw.id" @click="updateLayer({ id: draw.id }), itemIsUpdating = null">Save</button>
-            <button @click="removeLayer({ id: draw.id })">Remove</button>
+            <button class="btn btn--primary" @click="removeLayer({ id: draw.id })">Remove</button>
           </div>
         </div>
       </template>
@@ -195,9 +194,6 @@
         <font-awesome-icon icon="ruler" />
       </button>
     </Tiles>
-
-    <button class="btn" @click="generateSprite">Generate Sprites</button>
-    <div v-if="sprites">{{this.sprites}}</div>
 
   </div>
 </template>
@@ -561,7 +557,7 @@ export default {
 .tile-background{
   position: relative;
 
-  &:before{
+  &:after{
     content: "";
     position: absolute;
     width: 100%;

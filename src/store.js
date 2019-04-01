@@ -4,7 +4,7 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-function generateList() {
+const generateList= () => {
   const list = [];
   const size = state.canvasWidth * state.canvasHeight;
 
@@ -20,10 +20,70 @@ function generateList() {
   return list;
 }
 
-function uuidv4() {
+const uuidv4 = () => {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
   )
+}
+
+const generateCode = ({ updatedList, canvasWidth, canvasHeight, tileSize, payload }) => {
+  let html = "";
+  let list = "";
+  const listLines = [];
+  
+  updatedList.reduce((prev, curr) => {
+    let line = prev;
+    if (prev.color !== curr.color) {
+      if (listLines.indexOf(line) < 0) {
+        line.xe = prev.xs;
+        listLines.push(line);
+      }
+      return curr;
+    } else if (prev.ys !== curr.ys) {
+      if (listLines.indexOf(line) < 0) {
+        line.xe = prev.xs;
+        listLines.push(line);
+      }
+      return curr;
+    } else {
+      line.xe = curr.xs;
+      if (listLines.indexOf(line) < 0) {
+        listLines.push(line);
+      }
+    }
+    return line;
+  });
+
+  listLines.forEach(item => {
+    if (item.color !== "transparent") {
+      list += `<div class="pixgrid__pixel" id="${
+        item.id
+      }" style="background-color: ${item.color}; grid-area: ${item.ys +
+        1} / ${item.xs + 1} / ${item.ys + 2} / ${item.xe + 2}"></div>`;
+    }
+  });
+
+  if (payload && payload.minMax) {
+    html = `
+    <div class="pixgrid" style="display: grid; grid-template-columns: repeat(
+      ${canvasWidth}, minmax(1px, 
+      ${tileSize}px)); grid-template-rows: repeat(
+      ${canvasHeight}, minmax(1px, 
+      ${tileSize}px));">
+      ${list}</div>
+  `;
+  }
+  else{
+    html = `
+      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(
+        ${canvasWidth}, 
+        ${payload && payload.tileSize ? payload.tileSize : tileSize}px); grid-template-rows: repeat(
+        ${canvasHeight}, 
+        ${payload && payload.tileSize ? payload.tileSize : tileSize}px);">
+        ${list}</div>
+    `;
+  }
+  return html;
 }
 
 const state = {
@@ -141,51 +201,13 @@ const mutations = {
       state.generatedArt = null;
       return;
     }
-
-    const listLines = [];
-    state.updatedList.reduce((prev, curr) => {
-      let line = prev;
-      if (prev.color !== curr.color) {
-        if (listLines.indexOf(line) < 0) {
-          line.xe = prev.xs;
-          listLines.push(line);
-        }
-        return curr;
-      } else if (prev.ys !== curr.ys) {
-        if (listLines.indexOf(line) < 0) {
-          line.xe = prev.xs;
-          listLines.push(line);
-        }
-        return curr;
-      } else {
-        line.xe = curr.xs;
-        if (listLines.indexOf(line) < 0) {
-          listLines.push(line);
-        }
-      }
-      return line;
+    state.generatedArt = generateCode({
+      updatedList: state.updatedList,
+      canvasWidth: state.canvasWidth,
+      canvasHeight: state.canvasHeight,
+      tileSize: state.tileSize,
+      payload: payload
     });
-
-    let list = "";
-    listLines.forEach(item => {
-      if (item.color !== "transparent") {
-        list += `<div class="pixgrid__pixel" id="${
-          item.id
-        }" style="background-color: ${item.color}; grid-area: ${item.ys +
-          1} / ${item.xs + 1} / ${item.ys + 2} / ${item.xe + 2}"></div>`;
-      }
-    });
-    // const html = `
-    //   <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${state.canvasWidth}, ${state.tileSize}px); grid-template-rows: repeat(${state.canvasHeight}, ${state.tileSize}px);">${list}</div>
-    // `;
-    const html = `
-      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${
-        state.canvasWidth
-      }, minmax(1px, ${state.tileSize}px)); grid-template-rows: repeat(${
-      state.canvasHeight
-    }, minmax(1px, ${state.tileSize}px));">${list}</div>
-    `;
-    state.generatedArt = html;
   },
   bouncePickedColor(state) {
     state.bouncePickedColor = true;
@@ -215,22 +237,47 @@ const mutations = {
     state.projectName = payload;
   },
   saveState(state) {
+    const layers = state.layers.map(a => ({ ...a }));
+    layers.map(x => {
+      delete x.codeForView;
+      return x;
+    });
     state.save = {
       projectName: state.projectName,
       canvasWidth: state.canvasWidth,
       canvasHeight: state.canvasHeight,
       tileSize: state.tileSize,
-      updatedList: state.updatedList
+      layers: layers
     };
   },
-  setLayers(state) {
+  setLayers(state, payload) {
+    if (payload.clear) {
+      state.layers = [];
+      return;
+    }
+
+    if(payload.layers){
+      state.layers = payload.layers;
+      return;
+    }
+
     const code = state.generatedArt;
+    const codeForView = generateCode({
+      updatedList: state.updatedList,
+      canvasWidth: state.canvasWidth,
+      canvasHeight: state.canvasHeight,
+      tileSize: state.tileSize,
+      payload: {
+        tileSize: 5
+      }
+    });
     const canvas = state.updatedList.map(a => ({ ...a }));
     const list = state.layers;
     const layers = list.concat({
       id: uuidv4(),
       name: "Unamed Layer",
       code: code,
+      codeForView: codeForView,
       canvas: canvas
     });
 
@@ -272,7 +319,7 @@ const mutations = {
       keyframe += `${i * (100 / (size - 1))}% {margin-top: -${margin}px;}`;
     }
 
-    const sprites = state.layers.join("");
+    const sprites = state.layers.map(x => {return x.code}).join('');
 
     state.sprites = `<style>@keyframes sprite{${keyframe}}.pixel-grid-animation{overflow: hidden;height: ${width}px;width: ${height}px;} .pixel-grid-animation .pixel-grid-wrapper{animation: sprite 1s steps(1) infinite;}</style><div class="pixel-grid-animation"><div class="pixel-grid-wrapper">${sprites}</div></div>`;
   }
@@ -289,6 +336,7 @@ const actions = {
   setList: ({ commit }) => {
     commit("setUpdatedList", { list: generateList(), first: true });
     commit("generateArt", { clear: true });
+    commit("setLayers", { clear: true });
   },
   toggleGrid: ({ commit }) => commit("toggleGrid"),
   toggleRuler: ({ commit }) => commit("toggleRuler"),
@@ -326,7 +374,8 @@ const actions = {
   saveState: ({ commit }) => commit("saveState"),
   import: ({ commit }, payload) => {
     const obj = JSON.parse(payload);
-    commit("setUpdatedList", { list: obj.updatedList, first: true });
+    commit("setLayers", { layers: obj.layers });
+    commit("setUpdatedList", { list: obj.layers[0].canvas, first: true });
     commit("setCanvasWidth", obj.canvasWidth);
     commit("setCanvasHeight", obj.canvasHeight);
     commit("setTileSize", obj.tileSize);
@@ -334,13 +383,14 @@ const actions = {
     commit("generateArt", { clear: true });
   },
   generateSprite: ({ commit }) => commit("generateSprite"),
-  setLayers: ({ commit, state }) => {
-    commit("generateArt", state.updatedList);
-    commit("setLayers");
+  setLayers: ({ commit }, payload) => {
+    commit("generateArt");
+    commit("setLayers", payload);
   },
   updateLayer: ({ commit }, payload) => {
-    commit("generateArt", state.updatedList);
+    commit("generateArt");
     commit("updateLayer", payload);
+    commit("setUpdatedList", { list: state.updatedList.map(a => ({ ...a })) });
   },
   removeLayer: ({ commit }, payload) => commit("removeLayer", payload)
 };

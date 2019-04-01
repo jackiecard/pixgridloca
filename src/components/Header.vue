@@ -18,6 +18,7 @@ export default {
 
 <style lang="scss" scoped>
 header{
+  position: relative;
   max-height: 60px;
   background-color: #272727;
   color: #dadada;
@@ -25,6 +26,7 @@ header{
   text-align: left;
   display: flex;
   justify-content: space-between;
+  z-index: 1;
   
   .brand{
     display: flex;

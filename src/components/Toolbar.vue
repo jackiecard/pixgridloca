@@ -95,7 +95,8 @@ nav{
 
       &__tile{
         position: relative;
-        max-width: 200px;
+        max-width: 180px;
+        overflow: hidden;
         margin: 10px;
         border: 1px solid #ccc;
         box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.25);
