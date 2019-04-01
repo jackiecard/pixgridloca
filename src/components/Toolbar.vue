@@ -94,10 +94,23 @@ nav{
       height: calc(100% - 33px);
 
       &__tile{
+        position: relative;
         max-width: 200px;
         margin: 10px;
         border: 1px solid #ccc;
         box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.25);
+
+        &--active{
+          &:after{
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            border: 2px solid #d67d7e;
+          }
+        }
       }
     }
   }

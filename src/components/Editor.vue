@@ -165,9 +165,14 @@
       <template slot="aside">
         <button class="btn" @click="setLayers"><font-awesome-icon icon="plus" /> Add layer</button>
         <div class="layers">
-          <!-- {{this.layers}} -->
-          <div v-for="(draw,i) in this.layers.code" :key="i" class="layers__tile tile-background">
-            <span v-if="draw" v-html="draw"></span>
+          <div v-for="(draw,i) in this.layers" :key="i">
+            <button :class="['layers__tile tile-background', {'layers__tile--active': itemIsUpdating === draw.id}]">
+              <span v-if="draw.code" v-html="draw.code"></span>
+            </button>
+            <div>{{draw.name}}</div>
+            <button v-if="!itemIsUpdating" @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">Update</button>
+            <button v-if="itemIsUpdating === draw.id" @click="updateLayer({ id: draw.id }), itemIsUpdating = null">Save</button>
+            <button @click="removeLayer({ id: draw.id })">Remove</button>
           </div>
         </div>
       </template>
@@ -180,7 +185,7 @@
            :tile-size="tileSize * zoom" 
            :show-grid="showGrid"
            :show-ruler="showRuler"
-           @update-tiles="updateTiles">
+           @update-tiles="updateTile">
       <button :class="['btn', {'btn--hide': !showGrid}]" @click="toggleGrid()">
         {{showGrid ? 'Hide Grid' : 'Show Grid'}} 
         <font-awesome-icon icon="th-large" />
@@ -211,7 +216,8 @@ export default {
       newProjectName: '',
       showCopiedTip: false,
       showModal: false,
-      importedProject: ''
+      importedProject: '',
+      itemIsUpdating: null
     }
   },
   computed: mapGetters([
@@ -245,6 +251,7 @@ export default {
   methods: {
     ...mapActions([
       'setUpdatedList', 
+      'updateListItem',
       'toggleGrid', 
       'toggleRuler',
       'zoomIn',
@@ -255,7 +262,6 @@ export default {
       'generateArt',
       'eraser',
       'undo',
-      'setUpdatedList',
       'setCanvasWidth',
       'setCanvasHeight',
       'setTileSize',
@@ -264,7 +270,9 @@ export default {
       'saveState',
       'import',
       'setLayers',
-      'generateSprite'
+      'generateSprite',
+      'updateLayer',
+      'removeLayer'
     ]),
     importProject() {
       this.import(this.importedProject)
@@ -276,21 +284,8 @@ export default {
       this.setProjectName(Number(this.newProjectName))
       this.setList()
     },
-    updateTiles(e) {
-      const newList = this.updatedList.map(item => {
-        let newItem = null;
-        if (item.id === e.id) {
-          newItem = Object.assign({}, item);
-          if(this.isEraser){
-            newItem.color = "transparent";
-          }
-          else{
-            newItem.color = this.currentColor.value;
-          }
-        }
-        return newItem ? newItem : item;
-      });
-      this.setUpdatedList({ list: newList, first: false, pressed: e.pressed });
+    updateTile(e) {
+      this.updateListItem({ id: e.id, first: false, pressed: e.pressed });
     },
     setColor(color) {
       this.addColor(color);
@@ -574,7 +569,6 @@ export default {
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: 1;
     background-image: url('https://i.imgur.com/FerC2T4.png');
     opacity: .1;
   }

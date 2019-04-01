@@ -10,7 +10,7 @@ function generateList() {
 
   for (let i = 0; i < size; i++) {
     list.push({
-      id: "p" + i,
+      id: uuidv4(),
       xs: i % state.canvasWidth,
       ys: (i - (i % state.canvasWidth)) / state.canvasWidth,
       color: "transparent"
@@ -20,11 +20,11 @@ function generateList() {
   return list;
 }
 
-// function uuidv4() {
-//   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-//     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-//   )
-// }
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  )
+}
 
 const state = {
   projectName: "Awesome Pixel Grid",
@@ -33,10 +33,7 @@ const state = {
   backupList: [],
   canvasWidth: 5,
   canvasHeight: 5,
-  layers: {
-    canvas: [],
-    code: []
-  },
+  layers: [],
   sprites: "",
   showGrid: true,
   showRuler: true,
@@ -121,12 +118,23 @@ const mutations = {
     state.currentColor = payload;
   },
   setUpdatedList(state, payload) {
-    if (payload.first) {
+    if (payload.first || !payload.pressed) {
       state.backupList = payload.list;
-    } else if (!payload.pressed) {
-      state.backupList = state.updatedList;
     }
-    state.updatedList = payload.list;
+    state.updatedList = payload.list.map(x => ({...x}));
+  },
+  updateListItem(state, payload) {
+    const list = state.updatedList.map(item => {
+      if(item.id === payload.id){
+        if (state.isEraser) {
+          item.color = "transparent";
+        } else {
+          item.color = state.currentColor.value;
+        }
+      }
+      return item;
+    });
+    state.updatedList = list;
   },
   generateArt(state, payload) {
     if (payload && payload.clear) {
@@ -171,7 +179,11 @@ const mutations = {
     //   <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${state.canvasWidth}, ${state.tileSize}px); grid-template-rows: repeat(${state.canvasHeight}, ${state.tileSize}px);">${list}</div>
     // `;
     const html = `
-      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${state.canvasWidth}, minmax(1px, ${state.tileSize}px)); grid-template-rows: repeat(${state.canvasHeight}, minmax(1px, ${state.tileSize}px));">${list}</div>
+      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(${
+        state.canvasWidth
+      }, minmax(1px, ${state.tileSize}px)); grid-template-rows: repeat(${
+      state.canvasHeight
+    }, minmax(1px, ${state.tileSize}px));">${list}</div>
     `;
     state.generatedArt = html;
   },
@@ -212,30 +224,55 @@ const mutations = {
     };
   },
   setLayers(state) {
-    const canvas = state.layers.canvas;
-    const code = state.layers.code;
-    canvas.push(state.updatedList);
-    code.push(state.generatedArt);
+    const code = state.generatedArt;
+    const canvas = state.updatedList.map(a => ({ ...a }));
+    const list = state.layers;
+    const layers = list.concat({
+      id: uuidv4(),
+      name: "Unamed Layer",
+      code: code,
+      canvas: canvas
+    });
 
-    state.layers = {
-      canvas: canvas,
-      code: code
-    };
+    state.layers = layers;
   },
-  generateSprite(state){
+  updateLayer(state, payload) {
+    const layers = state.layers.map(item => {
+      if (item.id === payload.id) {
+          item.code = state.generatedArt;
+          item.canvas = state.updatedList;
+
+        if (payload.name) {
+          item.name = payload.name;
+        }
+      }
+      return item;
+    });
+
+    state.layers = layers;
+  },
+  removeLayer(state, payload) {
+    const filtered = state.layers.filter(item => {
+      return item.id !== payload.id;
+    });
+
+    state.layers = filtered;
+  },
+  generateSprite(state) {
     let keyframe = "";
     const width = state.canvasWidth * state.tileSize;
     const height = state.canvasHeight * state.tileSize;
-    const size = state.layers.code.length + 1;
+    const size = state.layers.length + 1;
     let acumulatedtMargin = 0;
 
-    for (let i = 0; i < size; i++) { 
-      let margin = (i + 1) === size ? acumulatedtMargin - height: acumulatedtMargin;
+    for (let i = 0; i < size; i++) {
+      let margin =
+        i + 1 === size ? acumulatedtMargin - height : acumulatedtMargin;
       acumulatedtMargin = acumulatedtMargin + height;
       keyframe += `${i * (100 / (size - 1))}% {margin-top: -${margin}px;}`;
     }
 
-    const sprites = state.layers.code.join("");
+    const sprites = state.layers.join("");
 
     state.sprites = `<style>@keyframes sprite{${keyframe}}.pixel-grid-animation{overflow: hidden;height: ${width}px;width: ${height}px;} .pixel-grid-animation .pixel-grid-wrapper{animation: sprite 1s steps(1) infinite;}</style><div class="pixel-grid-animation"><div class="pixel-grid-wrapper">${sprites}</div></div>`;
   }
@@ -245,6 +282,9 @@ const actions = {
   setUpdatedList: ({ commit }, payload) => {
     commit("setUpdatedList", payload);
     commit("generateArt", { clear: true });
+  },
+  updateListItem: ({ commit }, payload) => {
+    commit("updateListItem", payload);
   },
   setList: ({ commit }) => {
     commit("setUpdatedList", { list: generateList(), first: true });
@@ -293,11 +333,16 @@ const actions = {
     commit("setProjectName", obj.projectName);
     commit("generateArt", { clear: true });
   },
+  generateSprite: ({ commit }) => commit("generateSprite"),
   setLayers: ({ commit, state }) => {
     commit("generateArt", state.updatedList);
-    commit("setLayers")
+    commit("setLayers");
   },
-  generateSprite: ({ commit }) => commit("generateSprite"),
+  updateLayer: ({ commit }, payload) => {
+    commit("generateArt", state.updatedList);
+    commit("updateLayer", payload);
+  },
+  removeLayer: ({ commit }, payload) => commit("removeLayer", payload)
 };
 
 const getters = {
