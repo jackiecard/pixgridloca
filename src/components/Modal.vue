@@ -1,6 +1,6 @@
 <template>
   <transition name="modal">
-    <div class="modal-mask">
+    <div class="modal-mask" ref="modal">
       <div class="modal-wrapper">
         <div class="modal-container">
 
@@ -32,7 +32,12 @@
 
 <script>
 export default {
-  name: 'Modal'
+  name: 'Modal',
+  mounted(){
+    const app = document.querySelector('#app');
+    console.log(this.$refs.modal);
+    app.appendChild(this.$refs.modal);
+  }
 }
 </script>
 

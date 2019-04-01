@@ -256,8 +256,19 @@ const mutations = {
       return;
     }
 
-    if(payload.layers){
-      state.layers = payload.layers;
+    if(payload.config){
+      state.layers = payload.config.layers.map(a => {
+        a.codeForView = generateCode({
+          updatedList: a.canvas,
+          canvasWidth: payload.config.canvasWidth,
+          canvasHeight: payload.config.canvasHeight,
+          tileSize: payload.config.tileSize,
+          payload: {
+            tileSize: 5
+          }
+        });
+        return a;
+      });
       return;
     }
 
@@ -288,6 +299,15 @@ const mutations = {
       if (item.id === payload.id) {
           item.code = state.generatedArt;
           item.canvas = state.updatedList;
+          item.codeForView = generateCode({
+            updatedList: state.updatedList,
+            canvasWidth: state.canvasWidth,
+            canvasHeight: state.canvasHeight,
+            tileSize: state.tileSize,
+            payload: {
+              tileSize: 5
+            }
+          });
 
         if (payload.name) {
           item.name = payload.name;
@@ -374,7 +394,7 @@ const actions = {
   saveState: ({ commit }) => commit("saveState"),
   import: ({ commit }, payload) => {
     const obj = JSON.parse(payload);
-    commit("setLayers", { layers: obj.layers });
+    commit("setLayers", { config: obj });
     commit("setUpdatedList", { list: obj.layers[0].canvas, first: true });
     commit("setCanvasWidth", obj.canvasWidth);
     commit("setCanvasHeight", obj.canvasHeight);

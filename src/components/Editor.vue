@@ -162,16 +162,18 @@
       </template>
 
       <template slot="aside">
-        <button class="btn" @click="setLayers"><font-awesome-icon icon="plus" /> Add layer</button>
+        <button class="btn set-layer-btn" @click="setLayers"><font-awesome-icon icon="plus" /> <span>Add layer</span></button>
         <div class="layers">
           <div v-for="(draw,i) in this.layers" :key="i">
             <div :class="['layers__tile tile-background', {'layers__tile--active': itemIsUpdating === draw.id}]">
               <span v-if="draw.codeForView" v-html="draw.codeForView"></span>
             </div>
             <div>{{draw.name}}</div>
-            <button class="btn btn--primary" v-if="!itemIsUpdating" @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">Update</button>
-            <button v-if="itemIsUpdating === draw.id" @click="updateLayer({ id: draw.id }), itemIsUpdating = null">Save</button>
-            <button class="btn btn--primary" @click="removeLayer({ id: draw.id })">Remove</button>
+            <div class="layers__control">
+              <button class="btn" v-if="!itemIsUpdating" @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">Update</button>
+              <button v-if="itemIsUpdating === draw.id" @click="updateLayer({ id: draw.id }), itemIsUpdating = null">Save</button>
+              <button class="btn" @click="removeLayer({ id: draw.id })">Remove</button>
+            </div>
           </div>
         </div>
       </template>
@@ -433,6 +435,9 @@ export default {
   padding: 0;
   margin: 0;
   font-size: 12px;
+  margin: 5px;   
+  padding: 6px 15px;
+  min-width: 100px;
 
   &--active{
     &:before{
@@ -464,17 +469,11 @@ export default {
   &--primary{
     background-color: rgba(255, 255, 255, 0.45098039215686275);
     min-height: auto;
-    margin: 5px;   
-    padding: 6px 15px;
-    min-width: 100px;
   }
 
   &--secondary{
     background-color: transparent;
     min-height: auto;
-    margin: 5px;   
-    padding: 6px 15px;
-    min-width: 100px;
     background-color: #333333;
     color: #fff;
     border-color: transparent;
@@ -487,6 +486,8 @@ export default {
     min-width: 40px;
     min-height: 40px;
     margin-right: 10px;
+    margin: 0;   
+    padding: 0 5px;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -91,6 +91,7 @@ nav{
 
     .layers{
       overflow-y: auto;
+      overflow-x: hidden;
       height: calc(100% - 33px);
 
       &__tile{
@@ -112,6 +113,24 @@ nav{
             border: 2px solid #d67d7e;
           }
         }
+      }
+
+      &__control{
+        display: flex;
+      }
+    }
+
+    .set-layer-btn{
+      padding: 10px;
+
+      .svg-inline--fa{
+        height: 15px;    
+        padding: 0;
+        margin-bottom: -3px;
+      }
+
+      span{
+        padding: 10px;
       }
     }
   }

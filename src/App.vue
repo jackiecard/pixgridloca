@@ -8,7 +8,7 @@
         <span>PixGrid Editor <sup>Beta</sup></span>
       </template>
       <template slot="info">
-        <button class="btn" @click="showModal = true">
+        <button class="btn app-info" @click="showModal = true">
           <font-awesome-icon icon="question" />
         </button>
 
