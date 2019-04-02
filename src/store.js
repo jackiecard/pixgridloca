@@ -1,5 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import kebabCase from "lodash.kebabcase";
+const utils = require( "./utils");
 // import VuexPersist from "vuex-persist";
 
 Vue.use(Vuex);
@@ -10,7 +12,7 @@ const generateList= () => {
 
   for (let i = 0; i < size; i++) {
     list.push({
-      id: uuidv4(),
+      id: utils.uuidv4(),
       xs: i % state.canvasWidth,
       ys: (i - (i % state.canvasWidth)) / state.canvasWidth,
       color: "transparent"
@@ -18,12 +20,6 @@ const generateList= () => {
   }
 
   return list;
-}
-
-const uuidv4 = () => {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  )
 }
 
 const generateCode = ({ updatedList, canvasWidth, canvasHeight, tileSize, payload }) => {
@@ -54,9 +50,9 @@ const generateCode = ({ updatedList, canvasWidth, canvasHeight, tileSize, payloa
     return line;
   });
 
-  listLines.forEach(item => {
+  listLines.forEach((item, i) => {
     if (item.color !== "transparent") {
-      list += `<div class="pixgrid__pixel" id="${
+      list += `<div class="pixgrid-pixel" data-index="${i}" id="${
         item.id
       }" style="background-color: ${item.color}; grid-area: ${item.ys +
         1} / ${item.xs + 1} / ${item.ys + 2} / ${item.xe + 2}"></div>`;
@@ -65,7 +61,7 @@ const generateCode = ({ updatedList, canvasWidth, canvasHeight, tileSize, payloa
 
   if (payload && payload.minMax) {
     html = `
-    <div class="pixgrid" style="display: grid; grid-template-columns: repeat(
+    <div class="pixgrid-canvas" style="display: grid; grid-template-columns: repeat(
       ${canvasWidth}, minmax(1px, 
       ${tileSize}px)); grid-template-rows: repeat(
       ${canvasHeight}, minmax(1px, 
@@ -75,7 +71,7 @@ const generateCode = ({ updatedList, canvasWidth, canvasHeight, tileSize, payloa
   }
   else{
     html = `
-      <div class="pixgrid" style="display: grid; grid-template-columns: repeat(
+      <div class="pixgrid-canvas" style="display: grid; grid-template-columns: repeat(
         ${canvasWidth}, 
         ${payload && payload.tileSize ? payload.tileSize : tileSize}px); grid-template-rows: repeat(
         ${canvasHeight}, 
@@ -88,6 +84,7 @@ const generateCode = ({ updatedList, canvasWidth, canvasHeight, tileSize, payloa
 
 const state = {
   projectName: "Awesome Pixel Grid",
+  projectId: null,
   generatedArt: null,
   updatedList: [],
   backupList: [],
@@ -103,6 +100,7 @@ const state = {
   bouncePickedColor: false,
   isEraser: false,
   save: {},
+  exportedSingleSprite: {},
   currentColor: {
     id: "c2",
     value: "black"
@@ -236,6 +234,9 @@ const mutations = {
   setProjectName(state, payload) {
     state.projectName = payload;
   },
+  setProjectId(state) {
+    state.projectId = utils.uuidv4();
+  },
   saveState(state) {
     const layers = state.layers.map(a => ({ ...a }));
     layers.map(x => {
@@ -285,7 +286,7 @@ const mutations = {
     const canvas = state.updatedList.map(a => ({ ...a }));
     const list = state.layers;
     const layers = list.concat({
-      id: uuidv4(),
+      id: utils.uuidv4(),
       name: "Unamed Layer",
       code: code,
       codeForView: codeForView,
@@ -325,6 +326,16 @@ const mutations = {
 
     state.layers = filtered;
   },
+  updateLayerName(state, payload) {
+    const layers = state.layers.map(item => {
+      if (item.id === payload.id) {
+        item.name = payload.name;
+      }
+      return item;
+    });
+
+    state.layers = layers;
+  },
   generateSprite(state) {
     let keyframe = "";
     const width = state.canvasWidth * state.tileSize;
@@ -339,9 +350,10 @@ const mutations = {
       keyframe += `${i * (100 / (size - 1))}% {margin-top: -${margin}px;}`;
     }
 
-    const sprites = state.layers.map(x => {return x.code}).join('');
+    const sprites = state.layers.map((x, i) => {
+      return `<div class="pixgrid-sprite" id="${x.id}" data-count="${i}" data-name="${kebabCase(x.name)}">${x.code}</div>`}).join('');
 
-    state.sprites = `<style>@keyframes sprite{${keyframe}}.pixel-grid-animation{overflow: hidden;height: ${width}px;width: ${height}px;} .pixel-grid-animation .pixel-grid-wrapper{animation: sprite 1s steps(1) infinite;}</style><div class="pixel-grid-animation"><div class="pixel-grid-wrapper">${sprites}</div></div>`;
+    state.sprites = `<style>@keyframes sprite{${keyframe}}.pixgrid-animation{overflow: hidden;height: ${width}px;width: ${height}px;} .pixgrid-animation .pixgrid-wrapper{animation: sprite 1s steps(1) infinite;}</style><div class="pixgrid-animation" id="${state.projectId}" data-project-name="${kebabCase(state.projectName)}"><div class="pixgrid-wrapper">${sprites}</div></div>`;
   }
 };
 
@@ -354,6 +366,7 @@ const actions = {
     commit("updateListItem", payload);
   },
   setList: ({ commit }) => {
+    commit("setProjectId");
     commit("setUpdatedList", { list: generateList(), first: true });
     commit("generateArt", { clear: true });
     commit("setLayers", { clear: true });
@@ -412,7 +425,8 @@ const actions = {
     commit("updateLayer", payload);
     commit("setUpdatedList", { list: state.updatedList.map(a => ({ ...a })) });
   },
-  removeLayer: ({ commit }, payload) => commit("removeLayer", payload)
+  removeLayer: ({ commit }, payload) => commit("removeLayer", payload),
+  updateLayerName: ({ commit }, payload) => commit("updateLayerName", payload)
 };
 
 const getters = {

@@ -31,7 +31,11 @@
         </button>
         <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">
           Pencil <font-awesome-icon icon="pen" />
-          
+        </button>
+
+
+        <button class="btn btn--control" @click="undo(), toggleUndo()">
+          {{undoOn ? 'Redo' : 'Undo'}} <font-awesome-icon :icon="undoOn ? 'redo' : 'undo'" />
         </button>
 
         <popper
@@ -62,49 +66,22 @@
               </div>
               <div>Zoom {{zoom*100}}%</div>
             </div>
-            <button slot="reference" class="btn btn--control" id="zoom">
+            <button slot="reference" class="btn btn--control zoom" id="zoom">
               Zoom <font-awesome-icon icon="search" />
-              
             </button>
         </popper> 
-
-        <button class="btn btn--control" @click="undo()">
-          Undo <font-awesome-icon icon="undo" />
-          
-        </button>
         
-        <button class="btn btn--control" @click="showModal = true" id="clean">
-          Clean <font-awesome-icon icon="times" />
-          
+        <button class="btn btn--control" @click="showWarningModal = true" id="clean">
+          New <font-awesome-icon icon="file" />
         </button>
 
-        <modal v-if="showModal" @quit="showModal = false" @accept="showModal = false, setList()">
+        <modal v-if="showWarningModal" 
+          @quit="showWarningModal = false" 
+          @accept="showWarningModal = false, setNewConfig()"
+          :center=true>
           <h3 slot="header">Are you sure?</h3>
           <p slot="body">This is wipe out all the work done so far.</p>
         </modal>
-
-        <popper
-            trigger="click"
-            :options="{ placement: 'bottom' }">
-            <div class="popper">
-              <div class="settings">
-                <label for="project-name">Project Name</label>
-                <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
-                <label for="canvas-width">Canvas Width</label>
-                <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
-                <label for="canvas-height">Canvas Height</label>
-                <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
-                <label for="tile-size">Tile Size</label>
-                <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
-              </div>
-              <button class="btn btn--primary" @click="setNewConfig">Ok!</button>
-            </div>
-            <button slot="reference" class="btn btn--control" id="settings">
-              Settings <font-awesome-icon icon="cog" />
-              
-            </button>
-        </popper> 
-
 
         <popper
             trigger="click"
@@ -114,8 +91,8 @@
                 <h3>Save it for later</h3>
                 <textarea class="generated-art-field" 
                   v-if="save" 
-                  @click="copyContent(true)" 
-                  ref="saveTextarea">{{this.save}}</textarea>
+                  @click="copyContent('saveTextarea')" 
+                  id="saveTextarea">{{this.save}}</textarea>
                 <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
               </div>
             </div>
@@ -151,33 +128,96 @@
               <h3>Make it HTML</h3>
               <textarea class="generated-art-field" 
                 v-if="sprites" 
-                @click="copyContent()" 
-                ref="buildTextarea">{{this.sprites.trim()}}</textarea>
+                @click="copyContent('buildTextarea')" 
+                id="buildTextarea">{{this.sprites.trim()}}</textarea>
               <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
             </div>
             <button slot="reference" class="btn btn--control" @click="generateSprite()" id="export">
               Make <font-awesome-icon icon="plus-circle" />
             </button>
         </popper>
+
+
+        <popper
+            trigger="click"
+            :options="{ placement: 'bottom' }">
+            <div class="popper">
+              <div class="settings">
+                <label for="project-name">Project Name</label>
+                <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
+                <label for="canvas-width">Canvas Width</label>
+                <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
+                <label for="canvas-height">Canvas Height</label>
+                <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
+                <label for="tile-size">Tile Size</label>
+                <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
+              </div>
+              <button class="btn btn--primary" @click="showWarningModal = true">Ok!</button>
+            </div>
+            <button slot="reference" class="btn btn--control" id="settings">
+              Settings <font-awesome-icon icon="cog" />
+            </button>
+        </popper> 
+
       </template>
 
       <template slot="aside">
-        <button class="btn set-layer-btn" @click="setLayers"><font-awesome-icon icon="plus" /> <span>Add layer</span></button>
-        <div class="layers">
-          <div v-for="(draw,i) in this.layers" :key="i">
-            <div :class="['layers__tile tile-background', {'layers__tile--active': itemIsUpdating === draw.id}]">
-              <span v-if="draw.codeForView" v-html="draw.codeForView"></span>
-            </div>
-            <div>{{draw.name}}</div>
-            <div class="layers__control">
-              <button class="btn" v-if="!itemIsUpdating" @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">Update</button>
-              <button v-if="itemIsUpdating === draw.id" @click="updateLayer({ id: draw.id }), itemIsUpdating = null">Save</button>
-              <button class="btn" @click="removeLayer({ id: draw.id })">Remove</button>
+        <div :class="['aside', {'aside--show': showLayers}]"> 
+          <div class="layers">
+            <div v-for="(draw,i) in this.layers" :key="i" class="layers__item">
+              <div :class="['layers__tile tile-background', {'layers__tile--active': itemIsUpdating === draw.id}]">
+                <span v-if="draw.codeForView" v-html="draw.codeForView"></span>
+              </div>
+              <div class="layers__name">
+                <span v-if="updatingId !== draw.id" @click="updatingId = draw.id">{{draw.name}}</span>
+                <input v-if="updatingId === draw.id" type="text" v-model="newLayerName" placeholder="Layer Name" name="layer-name"/>
+                <button v-if="updatingId === draw.id" 
+                  class="btn btn--primary" 
+                  @click="updateThisName({ id: draw.id, name: newLayerName }), updatingId = null">
+                  <font-awesome-icon icon="check" />
+                </button>
+              </div>
+              <div class="layers__control">
+                <button class="btn btn--a11y btn--control" 
+                  v-if="itemIsUpdating === draw.id" 
+                  @click="updateLayer({ id: draw.id }), itemIsUpdating = null">
+                  Save changes
+                  <font-awesome-icon icon="check" />
+                </button>
+                <button class="btn btn--a11y btn--control" 
+                  v-if="!itemIsUpdating" 
+                  @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">
+                  Edit
+                  <font-awesome-icon icon="edit" />
+                </button>
+                <button class="btn btn--a11y btn--control" 
+                  @click="removeLayer({ id: draw.id })">
+                  Remove
+                  <font-awesome-icon icon="trash-alt" />
+                </button>
+
+                <popper
+                  trigger="click"
+                  :options="{ placement: 'left' }">
+                    <div class="popper">
+                      <h3>Sprite code:</h3>
+                      <textarea class="generated-art-field" 
+                        v-if="draw.code" 
+                        @click="copyContent('singleSpriteTextarea')" 
+                        id="singleSpriteTextarea">{{draw.code.trim()}}</textarea>
+                      <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+                    </div>
+                    <button slot="reference" class="btn btn--a11y btn--control">
+                      Export
+                      <font-awesome-icon icon="file-download" />
+                    </button>
+                </popper> 
+              </div>
             </div>
           </div>
+          <button class="btn set-layer-btn" @click="setLayers" id="add-layer"><font-awesome-icon icon="plus" /> <span>Add layer</span></button>
         </div>
       </template>
-
     </Toolbar>
 
     <Tiles :list="updatedList" 
@@ -197,6 +237,11 @@
       </button>
     </Tiles>
 
+    <button class="btn btn--secondary mobile-layer-btn" @click="toggleLayers">
+      <font-awesome-icon :icon="showLayers ? 'minus': 'plus'" /> 
+      <span>{{this.showLayers ? 'Hide layers': 'Show layers'}}</span>
+    </button>
+
   </div>
 </template>
 
@@ -213,9 +258,13 @@ export default {
       newTileSize: 10,
       newProjectName: '',
       showCopiedTip: false,
-      showModal: false,
+      showWarningModal: false,
       importedProject: '',
-      itemIsUpdating: null
+      itemIsUpdating: null,
+      undoOn: false,
+      updatingId: null,
+      newLayerName: '',
+      showLayers: false
     }
   },
   computed: mapGetters([
@@ -234,7 +283,8 @@ export default {
     'save',
     'projectName',
     'layers',
-    'sprites'
+    'sprites',
+    'exportedSingleSprite'
   ]),
   mounted(){
     if(!this.updatedList || this.updatedList.length <= 0){
@@ -270,7 +320,9 @@ export default {
       'setLayers',
       'generateSprite',
       'updateLayer',
-      'removeLayer'
+      'removeLayer',
+      'exportSingleSprite',
+      'updateLayerName'
     ]),
     importProject() {
       this.import(this.importedProject)
@@ -279,7 +331,7 @@ export default {
       this.setCanvasWidth(Number(this.newCanvasWidth))
       this.setCanvasHeight(Number(this.newCanvasHeight))
       this.setTileSize(Number(this.newTileSize))
-      this.setProjectName(Number(this.newProjectName))
+      this.setProjectName(this.newProjectName)
       this.setList()
     },
     updateTile(e) {
@@ -289,17 +341,26 @@ export default {
       this.addColor(color);
       this.newColor = "";
     },
-    copyContent(save){
-      let textarea = this.$refs.buildTextarea;
-      if(save) {
-        textarea = this.$refs.saveTextarea;
-      }
+    copyContent(field) {
+      const textarea = document.querySelector('#' + field);
       textarea.select();
       document.execCommand("copy");
       this.showCopiedTip = true;
       setTimeout(() => {
         this.showCopiedTip = false;
       }, 3000);
+    },
+    toggleUndo() {
+      this.undoOn = !this.undoOn;
+    },
+    updateThisName(obj) {
+      if(obj.name !== '') {
+        this.updateLayerName(obj);
+        this.newLayerName = '';
+      }
+    },
+    toggleLayers() {
+      this.showLayers = !this.showLayers;
     },
     bindKeyEvents() {
       document.addEventListener('keydown', (e) => {
@@ -351,7 +412,8 @@ export default {
         }
 
         // undo
-        if(key && e.key.toLowerCase() === '3'){
+        if(key && e.key.toLowerCase() === 'z'){
+          this.undoOn = !this.undoOn
           this.undo();
         }
 
@@ -382,6 +444,12 @@ export default {
         // build
         if(key && e.key.toLowerCase() === '8'){
           const exportBtn = document.querySelector('#export');
+          exportBtn.click();
+        }
+
+        // add layer
+        if(key && e.key.toLowerCase() === 'l'){
+          const exportBtn = document.querySelector('#add-layer');
           exportBtn.click();
         }
       });
@@ -437,7 +505,6 @@ export default {
   font-size: 12px;
   margin: 5px;   
   padding: 6px 15px;
-  min-width: 100px;
 
   &--active{
     &:before{
@@ -497,6 +564,10 @@ export default {
       height: 15px;
       padding: 3px 0;
     }
+  }
+
+  &--a11y{
+    font-size: 0;
   }
 }
 
@@ -568,6 +639,23 @@ export default {
     pointer-events: none;
     background-image: url('https://i.imgur.com/FerC2T4.png');
     opacity: .1;
+  }
+}
+
+.mobile-layer-btn{
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 0px -2px, rgba(0, 0, 0, 0.25) 0px 0px 1px -1px;    
+  padding: 5px;
+  z-index: 5;
+
+  @media (min-width: 800px) {
+    display: none;
   }
 }
 </style>

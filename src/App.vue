@@ -17,7 +17,7 @@
           <div slot="body">
             <p>PixGrid is a pixel art editor that uses <strong>CSS Grid Layout</strong> to build HTML/CSS only animations. </p>
             <p>These code can be pasted in any website or platform that accepts <strong>HTML</strong> and browsers that support Grid Layout.</p>
-            <p>It was created and it's mantained by <a href="https://github.com/jackiecard" title="github page">jackiecard</a>.</p>
+            <p>It was created and it's mantained by <a href="https://twitter.com/jackiecard_" target="_blank" title="twitter">jackiecard</a>.</p>
 
             <h3>List of shortcuts</h3>
             <ul class="shortcuts-list">
@@ -38,7 +38,7 @@
     </Header>
     <Editor/>
     <footer>
-      Made with <font-awesome-icon icon="heart" /> by <a href="https://github.com/jackiecard" title="Jackie's github page">jackiecard</a>.
+      Made with <font-awesome-icon icon="heart" /> by <a href="https://github.com/jackiecard" target="_blank" title="Jackie's github page">jackiecard</a>.
     </footer>
   </div>
 </template>
@@ -94,7 +94,7 @@ export default {
         {
           name: 'undo',
           icon: 'undo',
-          val: '3'
+          val: 'z'
         },
         {
           name: 'clean',
@@ -120,6 +120,11 @@ export default {
           name: 'Make',
           icon: 'plus-circle',
           val: '8'
+        },
+        {
+          name: 'add layer',
+          icon: 'layer-group',
+          val: 'l'
         },
       ]
     }

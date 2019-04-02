@@ -1,7 +1,7 @@
 <template>
   <transition name="modal">
     <div class="modal-mask" ref="modal">
-      <div class="modal-wrapper">
+      <div :class="['modal-wrapper', {'modal-wrapper--center-text': center}]">
         <div class="modal-container">
 
           <div class="modal-header">
@@ -33,6 +33,12 @@
 <script>
 export default {
   name: 'Modal',
+  props: {
+    center: {
+      required: false,
+      type: Boolean
+    }
+  },
   mounted(){
     const app = document.querySelector('#app');
     console.log(this.$refs.modal);
@@ -57,6 +63,11 @@ export default {
 .modal-wrapper {
   display: table-cell;
   vertical-align: middle;
+  text-align: left;
+
+  &--center-text{
+    text-align: center;
+  }
 }
 
 .modal-container {

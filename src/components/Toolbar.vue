@@ -7,7 +7,7 @@
       <slot name="control"/>
     </div>
 
-    <div class="aside">
+    <div class="aside-wrapper">
       <slot name="aside"/>
     </div>
   </nav>
@@ -77,22 +77,46 @@ nav{
       margin-top: -7px;
       grid-template-columns: repeat(10, 1fr);
     }
+
+    .btn.zoom{
+      margin: auto;
+    }
   }
 
   .aside{
-    height: calc(100vh - 40px);
+    height: calc(100vh - 90px);
     position: absolute;
     width: 200px;
     top: 0;
     right: 0;
     background: #dadada;
     border: 1px solid #ccc;
-    box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 0px -2px, rgba(0, 0, 0, 0.25) 0px 0px 1px -1px;
+    box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 0px -2px, rgba(0, 0, 0, 0.25) 0px 0px 1px -1px;    
+    z-index: 4;
+    display: none;
+
+    @media (min-width: 800px) {
+      height: calc(100vh - 40px);
+      display: block;
+    }
+
+    &--show{
+      display: block;
+    }
 
     .layers{
       overflow-y: auto;
       overflow-x: hidden;
-      height: calc(100% - 33px);
+      height: calc(100% - 60px);
+
+      &__item{
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+
+        &:last-child { 
+          border: 0;
+        }
+      }
 
       &__tile{
         position: relative;
@@ -117,21 +141,61 @@ nav{
 
       &__control{
         display: flex;
+        justify-content: center;
+
+        .btn{
+          min-height: 20px;
+        }
+      }
+
+      &__name{
+        margin: 0 10px;
+        display: flex;
+        justify-content: center;
+
+        span,
+        input{
+          font-size: 12px;
+          text-align: center;
+          height: 22px;
+        }
+
+        span:hover{
+          cursor: pointer;
+        }
+
+        input{
+          background: #dadada;
+          border: 1px solid #ccc;
+          box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.25);
+          width: 90%;
+          line-height: 22px;
+        }
+
+        .btn{
+          margin: 1px 0;
+          background-color: #dadada;
+
+          .svg-inline--fa{
+            height: 10px;    
+            padding: 0;
+          }
+        }
       }
     }
+  }
 
-    .set-layer-btn{
+  .set-layer-btn{
+    padding: 10px;
+
+    .svg-inline--fa{
+      height: 15px;    
+      padding: 0;
+      margin-bottom: -3px;
+    }
+
+    span{
       padding: 10px;
-
-      .svg-inline--fa{
-        height: 15px;    
-        padding: 0;
-        margin-bottom: -3px;
-      }
-
-      span{
-        padding: 10px;
-      }
     }
   }
 }
