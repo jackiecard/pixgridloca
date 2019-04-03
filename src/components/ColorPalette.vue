@@ -4,8 +4,7 @@
       <div class="color-palette__bg__tile" v-for="i in 32" :key="i"></div>
     </div>
     <li v-for="(tile, i) in paletteList" :key="i" @click="pickedColor(tile)">
-      <button :style="{backgroundColor: tile.value}">
-        <span v-if="tile.name">{{tile.name}}</span>
+      <button :style="{backgroundColor: tile}">
       </button>
     </li>
   </ul>
@@ -35,7 +34,7 @@ export default {
   grid-template-columns: repeat(8, 30px);
   grid-template-rows: repeat(2, 30px);
   margin: 0;
-  padding: 0;    
+  padding: 0 2px 0 0;
   height: 63px;
   max-width: 482px;
   overflow: hidden;

@@ -18,13 +18,15 @@ export default {
 
 <style lang="scss" scoped>
 header{
+  position: relative;
   max-height: 60px;
-  background-color: #272727;
-  color: #dadada;
-  padding: 15px 20px 10px;
+  background-color: var(--primary-color);
+  color: var(--first-layer-bg);
+  padding: 10px 20px 5px;
   text-align: left;
   display: flex;
   justify-content: space-between;
+  z-index: 1;
   
   .brand{
     display: flex;
@@ -47,13 +49,18 @@ header{
 
   .info{
     .btn{
-      color: #dadada;
+      color: var(--first-layer-bg);
 
       .svg-inline--fa{
         height: 12px;
         margin-bottom: -1px;
       }
     }
+  }
+
+  .app-info{
+    margin: 0;
+    padding: 0;
   }
 }
 </style>

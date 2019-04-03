@@ -9,30 +9,53 @@
             :options="{ placement: 'top' }">
             <div class="popper">
               <div>
-                <sketch-picker v-model="newColor" />
+                <sketch-picker v-model="newColor" 
+                  :presetColors="paletteList"/>
                 <button class="btn btn--primary" @click="setColor(newColor.hex8)">Add Color</button>
-              </div>
+                <button
+                  @click="showImportPaletteView = true"
+                  class="btn btn--primary">Import Palette</button>
+                </div>
             </div>
             <button slot="reference" class="btn btn--control" id="colorPicker">
               <span class="hide">Add Color</span> 
               <font-awesome-icon icon="plus" />
-              <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
+              <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor}">
                 <span class="current-color__doubled">Already here!</span>
               </div>
-              <span class="tip">1</span>
             </button>
           </popper>
         </div>
+
+        <modal v-if="showImportPaletteView" 
+          @quit="showImportPaletteView = false" 
+          @accept="showImportPaletteView = false, importPalette(importedPalette)"
+          :center=true>
+          <h3 slot="header">Import Palette</h3>
+          <div slot="body">
+            <p>Hi! We'll be working on a easier way to import files.</p>
+            <p>For now, you can paste each color (hex, rga, hsl) separated by line break. </p>
+            <p><a href="https://lospec.com" target="_blank">LOSPEC</a> has a incredible collection of <a href="https://lospec.com/palette-list" target="_blank">palettes</a> 
+              that you can use by downloding the .HEX file that you can paste here. 🙂</p>
+            <textarea class="generated-art-field" 
+              v-model="importedPalette"></textarea>
+          </div>
+        </modal>
+
       </template>
 
       <template slot="control">
         <button :class="['btn btn--control', {'btn--active': isEraser}]" @click="eraser(true)">
           Eraser <font-awesome-icon icon="eraser" />
-          <span class="tip">E</span>
+          
         </button>
         <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">
           Pencil <font-awesome-icon icon="pen" />
-          <span class="tip">W</span>
+        </button>
+
+
+        <button class="btn btn--control" @click="undo(), toggleUndo()">
+          {{undoOn ? 'Redo' : 'Undo'}} <font-awesome-icon :icon="undoOn ? 'redo' : 'undo'" />
         </button>
 
         <popper
@@ -45,44 +68,94 @@
                   id="zoom-in">
                   Zoom In 
                   <font-awesome-icon icon="search-plus" />
-                  <span class="tip">=</span>
+                  
                 </button>
                 <button :class="['btn btn--control', {'btn--disabled': zoom === 1/ this.tileSize}]" 
                   @click="zoomOut()"
                   id="zoom-out">
                   Zoom Out 
                   <font-awesome-icon icon="search-minus" />
-                  <span class="tip">-</span>
+                  
                 </button>
                 <button class="btn btn--control" 
                   @click="zoomReset()"
                   id="zoom-reset">Reset Zoom 
                   <font-awesome-icon icon="search" />
-                  <span class="tip">]</span>
+                  
                 </button>
               </div>
               <div>Zoom {{zoom*100}}%</div>
             </div>
-            <button slot="reference" class="btn btn--control" id="zoom">
+            <button slot="reference" class="btn btn--control zoom" id="zoom">
               Zoom <font-awesome-icon icon="search" />
-              <span class="tip">2</span>
             </button>
         </popper> 
-
-        <button class="btn btn--control" @click="undo()">
-          Undo <font-awesome-icon icon="undo" />
-          <span class="tip">3</span>
-        </button>
         
-        <button class="btn btn--control" @click="showModal = true" id="clean">
-          Clean <font-awesome-icon icon="times" />
-          <span class="tip">4</span>
+        <button class="btn btn--control" @click="showWarningModal = true" id="clean">
+          New <font-awesome-icon icon="file" />
         </button>
 
-        <modal v-if="showModal" @quit="showModal = false" @accept="showModal = false, setList()">
+        <modal v-if="showWarningModal" 
+          @quit="showWarningModal = false" 
+          @accept="showWarningModal = false, setNewConfig()"
+          :center=true>
           <h3 slot="header">Are you sure?</h3>
           <p slot="body">This is wipe out all the work done so far.</p>
         </modal>
+
+        <popper
+            trigger="click"
+            :options="{ placement: 'bottom' }">
+            <div class="popper">
+              <div class="save-settings">
+                <h3>Save it for later</h3>
+                <textarea class="generated-art-field" 
+                  v-if="save" 
+                  @click="copyContent('saveTextarea')" 
+                  id="saveTextarea">{{this.save}}</textarea>
+                <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+              </div>
+            </div>
+            <button slot="reference" class="btn btn--control" @click="saveState()" id="save-btn">
+              Save <font-awesome-icon icon="save" />
+              
+            </button>
+        </popper> 
+
+
+        <popper
+            trigger="click"
+            :options="{ placement: 'bottom' }">
+            <div class="popper">
+              <div class="save-settings">
+                <h3>Import project</h3>
+                <textarea class="generated-art-field" 
+                  v-model="importedProject"></textarea>
+              </div>
+              <button class="btn btn--primary" @click="importProject">Ok!</button>
+            </div>
+            <button slot="reference" class="btn btn--control" id="import-btn">
+              Import <font-awesome-icon icon="upload" />
+              
+            </button>
+        </popper> 
+
+        <popper
+            trigger="click"
+            :options="{ placement: 'top' }">
+            <div class="popper">
+              <h3>Make it HTML</h3>
+              <textarea class="generated-art-field" 
+                v-if="spritesCode" 
+                @click="copyContent('buildTextarea')" 
+                id="buildTextarea">{{this.spritesCode.trim()}}</textarea>
+              <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+            </div>
+            <button slot="reference" class="btn btn--control" @click="generateSprite()" id="export">
+              Make <font-awesome-icon icon="plus-circle" />
+            </button>
+        </popper>
+
 
         <popper
             trigger="click"
@@ -98,79 +171,81 @@
                 <label for="tile-size">Tile Size</label>
                 <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
               </div>
-              <button class="btn btn--primary" @click="setNewConfig">Ok!</button>
+              <button class="btn btn--primary" @click="showWarningModal = true">Ok!</button>
             </div>
             <button slot="reference" class="btn btn--control" id="settings">
               Settings <font-awesome-icon icon="cog" />
-              <span class="tip">5</span>
             </button>
         </popper> 
 
+      </template>
 
-        <popper
-            trigger="click"
-            :options="{ placement: 'bottom' }">
-            <div class="popper">
-              <div class="save-settings">
-                <h3>Save it for later</h3>
-                <textarea class="generated-art-field" 
-                  v-if="save" 
-                  @click="copyContent(true)" 
-                  ref="saveTextarea">{{this.save}}</textarea>
-                <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+      <template slot="aside">
+        <div :class="['aside', {'aside--show': showFrames}]"> 
+          <div class="frames">
+            <div v-for="(draw,i) in this.frames" :key="i" class="frames__item">
+              <div :class="['frames__tile tile-background', {'frames__tile--active': itemIsUpdating === draw.id}]">
+                <span v-if="draw.codeForView" v-html="draw.codeForView"></span>
+              </div>
+              <div class="frames__name">
+                <span v-if="updatingId !== draw.id" @click="updatingId = draw.id">{{draw.name}}</span>
+                <input v-if="updatingId === draw.id" type="text" v-model="newFrameName" placeholder="Frame Name" name="frame-name"/>
+                <button v-if="updatingId === draw.id" 
+                  class="btn btn--primary" 
+                  @click="updateThisName({ id: draw.id, name: newFrameName }), updatingId = null">
+                  <font-awesome-icon icon="check" />
+                </button>
+              </div>
+              <div class="frames__control">
+                <button class="btn btn--a11y btn--control" 
+                  v-if="itemIsUpdating === draw.id" 
+                  @click="updateFrame({ id: draw.id }), itemIsUpdating = null">
+                  Save changes
+                  <font-awesome-icon icon="check" />
+                </button>
+                <button class="btn btn--a11y btn--control" 
+                  v-if="!itemIsUpdating" 
+                  @click="setFrameGrid({ list: draw.canvas }), itemIsUpdating = draw.id">
+                  Edit
+                  <font-awesome-icon icon="edit" />
+                </button>
+                <button class="btn btn--a11y btn--control" 
+                  @click="removeFrame({ id: draw.id })">
+                  Remove
+                  <font-awesome-icon icon="trash-alt" />
+                </button>
+
+                <popper
+                  trigger="click"
+                  :options="{ placement: 'left' }">
+                    <div class="popper">
+                      <h3>Sprite code:</h3>
+                      <textarea class="generated-art-field" 
+                        v-if="draw.code" 
+                        @click="copyContent('singleSpriteTextarea')" 
+                        id="singleSpriteTextarea">{{draw.code.trim()}}</textarea>
+                      <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+                    </div>
+                    <button slot="reference" class="btn btn--a11y btn--control">
+                      Export
+                      <font-awesome-icon icon="file-download" />
+                    </button>
+                </popper> 
               </div>
             </div>
-            <button slot="reference" class="btn btn--control" @click="saveState()" id="save-btn">
-              Save <font-awesome-icon icon="save" />
-              <span class="tip">6</span>
-            </button>
-        </popper> 
-
-
-        <popper
-            trigger="click"
-            :options="{ placement: 'bottom' }">
-            <div class="popper">
-              <div class="save-settings">
-                <h3>Import project</h3>
-                <textarea class="generated-art-field" 
-                  v-if="save" 
-                  v-model="importedProject"></textarea>
-              </div>
-              <button class="btn btn--primary" @click="importProject">Ok!</button>
-            </div>
-            <button slot="reference" class="btn btn--control" id="import-btn">
-              Import <font-awesome-icon icon="upload" />
-              <span class="tip">7</span>
-            </button>
-        </popper> 
-
-        <popper
-            trigger="click"
-            :options="{ placement: 'top' }">
-            <div class="popper">
-              <h3>Make it HTML</h3>
-              <textarea class="generated-art-field" 
-                v-if="generatedArt" 
-                @click="copyContent()" 
-                ref="buildTextarea">{{this.generatedArt.trim()}}</textarea>
-              <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
-            </div>
-            <button slot="reference" class="btn btn--control" @click="generateArt()" id="export">
-              Make <font-awesome-icon icon="plus-circle" />
-              <span class="tip">8</span>
-            </button>
-        </popper>
+          </div>
+          <button class="btn set-frame-btn" @click="setFrames" id="add-frame"><font-awesome-icon icon="plus" /> <span>Add Frame</span></button>
+        </div>
       </template>
     </Toolbar>
 
-    <Tiles :list="updatedList" 
+    <Tiles :list="frameGrid" 
            :canvas-width="canvasWidth" 
            :canvas-height="canvasHeight" 
            :tile-size="tileSize * zoom" 
            :show-grid="showGrid"
            :show-ruler="showRuler"
-           @update-tiles="updateTiles">
+           @update-tiles="updateTile">
       <button :class="['btn', {'btn--hide': !showGrid}]" @click="toggleGrid()">
         {{showGrid ? 'Hide Grid' : 'Show Grid'}} 
         <font-awesome-icon icon="th-large" />
@@ -180,6 +255,12 @@
         <font-awesome-icon icon="ruler" />
       </button>
     </Tiles>
+
+    <button class="btn btn--secondary mobile-frame-btn" @click="toggleFrames">
+      <font-awesome-icon :icon="showFrames ? 'minus': 'plus'" /> 
+      <span>{{this.showFrames ? 'Hide Frames': 'Show Frames'}}</span>
+    </button>
+
   </div>
 </template>
 
@@ -196,12 +277,19 @@ export default {
       newTileSize: 10,
       newProjectName: '',
       showCopiedTip: false,
-      showModal: false,
-      importedProject: ''
+      showWarningModal: false,
+      importedProject: '',
+      itemIsUpdating: null,
+      undoOn: false,
+      updatingId: null,
+      newFrameName: '',
+      showFrames: false,
+      showImportPaletteView: false,
+      importedPalette: ''
     }
   },
   computed: mapGetters([
-    'updatedList',
+    'frameGrid',
     'canvasWidth',
     'canvasHeight',
     'showGrid',
@@ -210,14 +298,17 @@ export default {
     'tileSize',
     'paletteList',
     'currentColor',
-    'generatedArt',
+    'spriteCode',
     'bouncePickedColor',
     'isEraser',
     'save',
-    'projectName'
+    'projectName',
+    'frames',
+    'spritesCode',
+    'exportedSingleSprite'
   ]),
   mounted(){
-    if(!this.updatedList || this.updatedList.length <= 0){
+    if(!this.frameGrid || this.frameGrid.length <= 0){
       this.setList();
     }
     this.bindKeyEvents();
@@ -228,7 +319,8 @@ export default {
   },
   methods: {
     ...mapActions([
-      'setUpdatedList', 
+      'setFrameGrid', 
+      'updateListItem',
       'toggleGrid', 
       'toggleRuler',
       'zoomIn',
@@ -245,7 +337,13 @@ export default {
       'setProjectName',
       'setList',
       'saveState',
-      'import'
+      'import',
+      'setFrames',
+      'generateSprite',
+      'updateFrame',
+      'removeFrame',
+      'updateFrameName',
+      'importPalette'
     ]),
     importProject() {
       this.import(this.importedProject)
@@ -254,40 +352,36 @@ export default {
       this.setCanvasWidth(Number(this.newCanvasWidth))
       this.setCanvasHeight(Number(this.newCanvasHeight))
       this.setTileSize(Number(this.newTileSize))
-      this.setProjectName(Number(this.newProjectName))
+      this.setProjectName(this.newProjectName)
       this.setList()
     },
-    updateTiles(e) {
-      const newList = this.updatedList.map(item => {
-        let newItem = null;
-        if (item.id === e.id) {
-          newItem = Object.assign({}, item);
-          if(this.isEraser){
-            newItem.color = "transparent";
-          }
-          else{
-            newItem.color = this.currentColor.value;
-          }
-        }
-        return newItem ? newItem : item;
-      });
-      this.setUpdatedList({ list: newList, first: false, pressed: e.pressed });
+    updateTile(e) {
+      this.updateListItem({ id: e.id, first: false, pressed: e.pressed });
     },
     setColor(color) {
       this.addColor(color);
       this.newColor = "";
     },
-    copyContent(save){
-      let textarea = this.$refs.buildTextarea;
-      if(save) {
-        textarea = this.$refs.saveTextarea;
-      }
+    copyContent(field) {
+      const textarea = document.querySelector('#' + field);
       textarea.select();
       document.execCommand("copy");
       this.showCopiedTip = true;
       setTimeout(() => {
         this.showCopiedTip = false;
       }, 3000);
+    },
+    toggleUndo() {
+      this.undoOn = !this.undoOn;
+    },
+    updateThisName(obj) {
+      if(obj.name !== '') {
+        this.updateFrameName(obj);
+        this.newFrameName = '';
+      }
+    },
+    toggleFrames() {
+      this.showFrames = !this.showFrames;
     },
     bindKeyEvents() {
       document.addEventListener('keydown', (e) => {
@@ -339,7 +433,8 @@ export default {
         }
 
         // undo
-        if(key && e.key.toLowerCase() === '3'){
+        if(key && e.key.toLowerCase() === 'z'){
+          this.undoOn = !this.undoOn
           this.undo();
         }
 
@@ -372,6 +467,12 @@ export default {
           const exportBtn = document.querySelector('#export');
           exportBtn.click();
         }
+
+        // add frame
+        if(key && e.key.toLowerCase() === '0'){
+          const exportBtn = document.querySelector('#add-frame');
+          exportBtn.click();
+        }
       });
     }
   }
@@ -381,7 +482,7 @@ export default {
 <style lang="scss">
 .current-color{
   position: relative;
-  border: 1px solid #000;
+  border: 1px solid var(--border-color);
   width: 30px;
   height: 30px;
   transform: scale(1, 1);
@@ -399,7 +500,7 @@ export default {
     font-size: 11px;
     line-height: 11px;
     text-shadow: 0px 0px 1px #000, 0px 0px 1px #000, 0px 0px 1px #000, 0px 0px 1px #000;
-    color: #fff;
+    color: var(--light-color);
     transition: opacity .5s ease-in-out,
                 transform .5s ease-in-out;
   }
@@ -423,17 +524,23 @@ export default {
   padding: 0;
   margin: 0;
   font-size: 12px;
+  margin: 5px;   
+  padding: 6px 15px;
 
   &--active{
     &:before{
       content: "";
       position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background-color: rgb(214, 125, 125);
+      bottom: 5px;
+      right: 6px;
+      background-color: var(--brand-color);
       width: 6px;
       height: 6px;
       border-radius: 50%;
+
+      @media (min-width: 800px) {
+        bottom: 20px;
+      }
     }
   }
 
@@ -450,19 +557,13 @@ export default {
   &--primary{
     background-color: rgba(255, 255, 255, 0.45098039215686275);
     min-height: auto;
-    margin: 5px;   
-    padding: 6px 15px;
-    min-width: 100px;
   }
 
   &--secondary{
     background-color: transparent;
     min-height: auto;
-    margin: 5px;   
-    padding: 6px 15px;
-    min-width: 100px;
-    background-color: #333333;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: var(--light-color);
     border-color: transparent;
   }
 
@@ -470,42 +571,37 @@ export default {
     font-size: 9px;
     position: relative;
     height: 100%;
-    min-width: 60px;
-    min-height: 60px;
+    min-width: 40px;
+    min-height: 40px;
+    margin-right: 10px;
+    margin: 0;   
+    padding: 0 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    .tip{
-      display: none;
-      position: absolute;
-      top: 2px;
-      right: 5px;
-      font-size: 8px;
-
-      .svg-inline--fa{
-        height: 8px;
-        padding: 0;
-      }
-
-      @media (min-width: 800px) {
-        display: block;
-      }
+    .svg-inline--fa{
+      height: 15px;
+      padding: 3px 0;
     }
+  }
+
+  &--a11y{
+    font-size: 0;
   }
 }
 
 .editor .vc-sketch{
   box-shadow: none;
-  background-color: #eaeaea;
+  background-color: var(--second-layer-bg);
 }
 
 .popper{
   box-shadow: rgb(138, 138, 138) 7px 7px 0px -4px;
   border-radius: 0;
-  background-color: #eaeaea;
-  border-color: #eaeaea;
+  background-color: var(--second-layer-bg);
+  border-color: var(--second-layer-bg);
 }
 
 .generated-art-field{
@@ -513,8 +609,8 @@ export default {
   min-height: 100px;
   max-height: 200px;
   resize: none;
-  background-color: #272727;
-  color: #dadada;
+  background-color: var(--primary-color);
+  color: var(--first-layer-bg);
   font-size: 12px;
 
   &__copy{
@@ -549,5 +645,38 @@ export default {
 
 .zoom-config{
   display: flex;
+}
+
+.tile-background{
+  position: relative;
+
+  &:after{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: url('https://i.imgur.com/FerC2T4.png');
+    opacity: .1;
+  }
+}
+
+.mobile-frame-btn{
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 0px -2px, rgba(0, 0, 0, 0.25) 0px 0px 1px -1px;    
+  padding: 5px;
+  z-index: 5;
+
+  @media (min-width: 800px) {
+    display: none;
+  }
 }
 </style>

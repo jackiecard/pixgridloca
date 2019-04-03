@@ -12,6 +12,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.8.1",
     "@fortawesome/vue-fontawesome": "^0.1.6",
     "i": "^0.3.6",
+    "lodash.kebabcase": "^4.1.1",
     "normalize.css": "^8.0.1",
     "npm": "^6.9.0",
     "vue": "^2.6.6",
@@ -55,6 +56,6 @@
   "browserslist": [
     "> 1%",
     "last 2 versions",
-    "not ie <= 8"
+    "not ie <= 10"
   ]
 }

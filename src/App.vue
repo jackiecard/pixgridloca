@@ -8,16 +8,16 @@
         <span>PixGrid Editor <sup>Beta</sup></span>
       </template>
       <template slot="info">
-        <button class="btn" @click="showModal = true">
+        <button class="btn app-info" @click="showModal = true">
           <font-awesome-icon icon="question" />
         </button>
 
         <modal v-if="showModal">
           <h3 slot="header">What is this place?</h3>
           <div slot="body">
-            <p>PixGrid is a pixel art editor that uses <strong>CSS Grid Layout</strong> to build HTML markup. </p>
-            <p>These code can be pasted in any website or platform that accepts <strong>HTML</strong> and supports Grid Layout.</p>
-            <p>It was created and it's mantained by <a href="https://github.com/jackiecard" title="github page">jackiecard</a>.</p>
+            <p>PixGrid is a pixel art editor that uses <strong>CSS Grid Layout</strong> to build HTML/CSS only animations. </p>
+            <p>These code can be pasted in any website or platform that accepts <strong>HTML</strong> and browsers that support Grid Layout.</p>
+            <p>It was created and it's mantained by <a href="https://twitter.com/jackiecard_" target="_blank" title="twitter">jackiecard</a>.</p>
 
             <h3>List of shortcuts</h3>
             <ul class="shortcuts-list">
@@ -27,6 +27,8 @@
                 <i>ctrl + {{item.val}}</i>
               </li>
             </ul>
+
+            <p>Credits for <a href="https://twitter.com/ENDESGA" target="_blank">ENDESGA</a> for the default color palette.</p>
           </div>
           <div slot="footer">
             <button class="btn btn--primary" @click="showModal = false">
@@ -38,7 +40,7 @@
     </Header>
     <Editor/>
     <footer>
-      Made with <font-awesome-icon icon="heart" /> by <a href="https://github.com/jackiecard" title="Jackie's github page">jackiecard</a>.
+      Made with <font-awesome-icon icon="heart" /> by <a href="https://github.com/jackiecard" target="_blank" title="Jackie's github page">jackiecard</a>.
     </footer>
   </div>
 </template>
@@ -94,7 +96,7 @@ export default {
         {
           name: 'undo',
           icon: 'undo',
-          val: '3'
+          val: 'z'
         },
         {
           name: 'clean',
@@ -121,6 +123,11 @@ export default {
           icon: 'plus-circle',
           val: '8'
         },
+        {
+          name: 'add frame',
+          icon: 'layer-group',
+          val: '0'
+        },
       ]
     }
   }
@@ -137,14 +144,20 @@ body{
 }
 
 #app {
+  --primary-color: #333;
+  --brand-color: rgb(214, 125, 125);
+  --light-color: #fff;
   --border-color: rgba(0, 0, 0, 0.05);
+  --border-color-light: #ccc;
   --border-color-active: #ffffff;
+  --first-layer-bg: #dadada;
+  --second-layer-bg: #eaeaea;
 
   font-family: 'Inconsolata', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: var(--primary-color);
 
   button,
   input{
@@ -152,11 +165,11 @@ body{
   }
 
   .popper[x-placement^="bottom"] .popper__arrow {
-    border-color: transparent transparent #eaeaea transparent;
+    border-color: transparent transparent var(--second-layer-bg) transparent;
   }
 
   .popper[x-placement^="right"] .popper__arrow {
-    border-color: transparent #eaeaea transparent transparent;
+    border-color: transparent var(--second-layer-bg) transparent transparent;
   }
 
   footer{
