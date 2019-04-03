@@ -1,5 +1,6 @@
 # PixGrid Editor
 
+
 ## Project setup
 ```
 npm install
