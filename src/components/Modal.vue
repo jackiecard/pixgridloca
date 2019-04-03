@@ -41,7 +41,6 @@ export default {
   },
   mounted(){
     const app = document.querySelector('#app');
-    console.log(this.$refs.modal);
     app.appendChild(this.$refs.modal);
   }
 }
@@ -75,12 +74,12 @@ export default {
   max-width: 500px;
   margin: 0px auto;
   padding: 10px 20px;
-  background-color: #eaeaea;
+  background-color: var(--second-layer-bg);
   border-radius: 2px;
   box-shadow: rgba(0, 0, 0, 0.25098) 6px 6px 0px -2px;
   transition: all .3s ease;
   font-size: 12px;
-  color: #333;
+  color: var(--primary-color);
 }
 
 .modal-header h3 {

@@ -25,7 +25,7 @@ nav{
   flex-wrap: wrap;
   position: sticky;
   top: 0;
-  background-color: #dadada;    
+  background-color: var(--first-layer-bg);    
   box-shadow: rgba(0, 0, 0, 0.25098039215686274) 3px 4px 0px -2px;
   padding: 10px 10px 5px;
   z-index: 2;
@@ -48,18 +48,6 @@ nav{
         height: 100%;
         padding: 5px;
         min-width: auto;
-
-        .tip{
-          position: absolute;
-          top: 2px;
-          right: 5px;
-          font-size: 8px;
-
-          .svg-inline--fa{
-            height: 8px;
-            padding: 0;
-          }
-        }
 
         .hide{
           font-size: 0;
@@ -89,8 +77,8 @@ nav{
     width: 200px;
     top: 0;
     right: 0;
-    background: #dadada;
-    border: 1px solid #ccc;
+    background: var(--first-layer-bg);
+    border: 1px solid var(--border-color-light);
     box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 0px -2px, rgba(0, 0, 0, 0.25) 0px 0px 1px -1px;    
     z-index: 4;
     display: none;
@@ -104,7 +92,7 @@ nav{
       display: block;
     }
 
-    .layers{
+    .frames{
       overflow-y: auto;
       overflow-x: hidden;
       height: calc(100% - 60px);
@@ -123,19 +111,11 @@ nav{
         max-width: 180px;
         overflow: hidden;
         margin: 10px;
-        border: 1px solid #ccc;
+        border: 1px solid var(--border-color-light);
         box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.25);
 
         &--active{
-          &:after{
-            content: "";
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            width: calc(100% + 2px);
-            height: calc(100% + 2px);
-            border: 2px solid #d67d7e;
-          }
+          outline: 2px solid var(--brand-color);
         }
       }
 
@@ -165,8 +145,8 @@ nav{
         }
 
         input{
-          background: #dadada;
-          border: 1px solid #ccc;
+          background: var(--first-layer-bg);
+          border: 1px solid var(--border-color-light);
           box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.25);
           width: 90%;
           line-height: 22px;
@@ -174,7 +154,7 @@ nav{
 
         .btn{
           margin: 1px 0;
-          background-color: #dadada;
+          background-color: var(--first-layer-bg);
 
           .svg-inline--fa{
             height: 10px;    
@@ -185,7 +165,7 @@ nav{
     }
   }
 
-  .set-layer-btn{
+  .set-frame-btn{
     padding: 10px;
 
     .svg-inline--fa{

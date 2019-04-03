@@ -9,19 +9,39 @@
             :options="{ placement: 'top' }">
             <div class="popper">
               <div>
-                <sketch-picker v-model="newColor" />
+                <sketch-picker v-model="newColor" 
+                  :presetColors="paletteList"/>
                 <button class="btn btn--primary" @click="setColor(newColor.hex8)">Add Color</button>
-              </div>
+                <button
+                  @click="showImportPaletteView = true"
+                  class="btn btn--primary">Import Palette</button>
+                </div>
             </div>
             <button slot="reference" class="btn btn--control" id="colorPicker">
               <span class="hide">Add Color</span> 
               <font-awesome-icon icon="plus" />
-              <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor.value}">
+              <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor}">
                 <span class="current-color__doubled">Already here!</span>
               </div>
             </button>
           </popper>
         </div>
+
+        <modal v-if="showImportPaletteView" 
+          @quit="showImportPaletteView = false" 
+          @accept="showImportPaletteView = false, importPalette(importedPalette)"
+          :center=true>
+          <h3 slot="header">Import Palette</h3>
+          <div slot="body">
+            <p>Hi! We'll be working on a easier way to import files.</p>
+            <p>For now, you can paste each color (hex, rga, hsl) separated by line break. </p>
+            <p><a href="https://lospec.com" target="_blank">LOSPEC</a> has a incredible collection of <a href="https://lospec.com/palette-list" target="_blank">palettes</a> 
+              that you can use by downloding the .HEX file that you can paste here. 🙂</p>
+            <textarea class="generated-art-field" 
+              v-model="importedPalette"></textarea>
+          </div>
+        </modal>
+
       </template>
 
       <template slot="control">
@@ -110,7 +130,6 @@
               <div class="save-settings">
                 <h3>Import project</h3>
                 <textarea class="generated-art-field" 
-                  v-if="save" 
                   v-model="importedProject"></textarea>
               </div>
               <button class="btn btn--primary" @click="importProject">Ok!</button>
@@ -127,9 +146,9 @@
             <div class="popper">
               <h3>Make it HTML</h3>
               <textarea class="generated-art-field" 
-                v-if="sprites" 
+                v-if="spritesCode" 
                 @click="copyContent('buildTextarea')" 
-                id="buildTextarea">{{this.sprites.trim()}}</textarea>
+                id="buildTextarea">{{this.spritesCode.trim()}}</textarea>
               <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
             </div>
             <button slot="reference" class="btn btn--control" @click="generateSprite()" id="export">
@@ -162,36 +181,36 @@
       </template>
 
       <template slot="aside">
-        <div :class="['aside', {'aside--show': showLayers}]"> 
-          <div class="layers">
-            <div v-for="(draw,i) in this.layers" :key="i" class="layers__item">
-              <div :class="['layers__tile tile-background', {'layers__tile--active': itemIsUpdating === draw.id}]">
+        <div :class="['aside', {'aside--show': showFrames}]"> 
+          <div class="frames">
+            <div v-for="(draw,i) in this.frames" :key="i" class="frames__item">
+              <div :class="['frames__tile tile-background', {'frames__tile--active': itemIsUpdating === draw.id}]">
                 <span v-if="draw.codeForView" v-html="draw.codeForView"></span>
               </div>
-              <div class="layers__name">
+              <div class="frames__name">
                 <span v-if="updatingId !== draw.id" @click="updatingId = draw.id">{{draw.name}}</span>
-                <input v-if="updatingId === draw.id" type="text" v-model="newLayerName" placeholder="Layer Name" name="layer-name"/>
+                <input v-if="updatingId === draw.id" type="text" v-model="newFrameName" placeholder="Frame Name" name="frame-name"/>
                 <button v-if="updatingId === draw.id" 
                   class="btn btn--primary" 
-                  @click="updateThisName({ id: draw.id, name: newLayerName }), updatingId = null">
+                  @click="updateThisName({ id: draw.id, name: newFrameName }), updatingId = null">
                   <font-awesome-icon icon="check" />
                 </button>
               </div>
-              <div class="layers__control">
+              <div class="frames__control">
                 <button class="btn btn--a11y btn--control" 
                   v-if="itemIsUpdating === draw.id" 
-                  @click="updateLayer({ id: draw.id }), itemIsUpdating = null">
+                  @click="updateFrame({ id: draw.id }), itemIsUpdating = null">
                   Save changes
                   <font-awesome-icon icon="check" />
                 </button>
                 <button class="btn btn--a11y btn--control" 
                   v-if="!itemIsUpdating" 
-                  @click="setUpdatedList({ list: draw.canvas }), itemIsUpdating = draw.id">
+                  @click="setFrameGrid({ list: draw.canvas }), itemIsUpdating = draw.id">
                   Edit
                   <font-awesome-icon icon="edit" />
                 </button>
                 <button class="btn btn--a11y btn--control" 
-                  @click="removeLayer({ id: draw.id })">
+                  @click="removeFrame({ id: draw.id })">
                   Remove
                   <font-awesome-icon icon="trash-alt" />
                 </button>
@@ -215,12 +234,12 @@
               </div>
             </div>
           </div>
-          <button class="btn set-layer-btn" @click="setLayers" id="add-layer"><font-awesome-icon icon="plus" /> <span>Add layer</span></button>
+          <button class="btn set-frame-btn" @click="setFrames" id="add-frame"><font-awesome-icon icon="plus" /> <span>Add Frame</span></button>
         </div>
       </template>
     </Toolbar>
 
-    <Tiles :list="updatedList" 
+    <Tiles :list="frameGrid" 
            :canvas-width="canvasWidth" 
            :canvas-height="canvasHeight" 
            :tile-size="tileSize * zoom" 
@@ -237,9 +256,9 @@
       </button>
     </Tiles>
 
-    <button class="btn btn--secondary mobile-layer-btn" @click="toggleLayers">
-      <font-awesome-icon :icon="showLayers ? 'minus': 'plus'" /> 
-      <span>{{this.showLayers ? 'Hide layers': 'Show layers'}}</span>
+    <button class="btn btn--secondary mobile-frame-btn" @click="toggleFrames">
+      <font-awesome-icon :icon="showFrames ? 'minus': 'plus'" /> 
+      <span>{{this.showFrames ? 'Hide Frames': 'Show Frames'}}</span>
     </button>
 
   </div>
@@ -263,12 +282,14 @@ export default {
       itemIsUpdating: null,
       undoOn: false,
       updatingId: null,
-      newLayerName: '',
-      showLayers: false
+      newFrameName: '',
+      showFrames: false,
+      showImportPaletteView: false,
+      importedPalette: ''
     }
   },
   computed: mapGetters([
-    'updatedList',
+    'frameGrid',
     'canvasWidth',
     'canvasHeight',
     'showGrid',
@@ -277,17 +298,17 @@ export default {
     'tileSize',
     'paletteList',
     'currentColor',
-    'generatedArt',
+    'spriteCode',
     'bouncePickedColor',
     'isEraser',
     'save',
     'projectName',
-    'layers',
-    'sprites',
+    'frames',
+    'spritesCode',
     'exportedSingleSprite'
   ]),
   mounted(){
-    if(!this.updatedList || this.updatedList.length <= 0){
+    if(!this.frameGrid || this.frameGrid.length <= 0){
       this.setList();
     }
     this.bindKeyEvents();
@@ -298,7 +319,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'setUpdatedList', 
+      'setFrameGrid', 
       'updateListItem',
       'toggleGrid', 
       'toggleRuler',
@@ -317,12 +338,12 @@ export default {
       'setList',
       'saveState',
       'import',
-      'setLayers',
+      'setFrames',
       'generateSprite',
-      'updateLayer',
-      'removeLayer',
-      'exportSingleSprite',
-      'updateLayerName'
+      'updateFrame',
+      'removeFrame',
+      'updateFrameName',
+      'importPalette'
     ]),
     importProject() {
       this.import(this.importedProject)
@@ -355,12 +376,12 @@ export default {
     },
     updateThisName(obj) {
       if(obj.name !== '') {
-        this.updateLayerName(obj);
-        this.newLayerName = '';
+        this.updateFrameName(obj);
+        this.newFrameName = '';
       }
     },
-    toggleLayers() {
-      this.showLayers = !this.showLayers;
+    toggleFrames() {
+      this.showFrames = !this.showFrames;
     },
     bindKeyEvents() {
       document.addEventListener('keydown', (e) => {
@@ -447,9 +468,9 @@ export default {
           exportBtn.click();
         }
 
-        // add layer
-        if(key && e.key.toLowerCase() === 'l'){
-          const exportBtn = document.querySelector('#add-layer');
+        // add frame
+        if(key && e.key.toLowerCase() === '0'){
+          const exportBtn = document.querySelector('#add-frame');
           exportBtn.click();
         }
       });
@@ -461,7 +482,7 @@ export default {
 <style lang="scss">
 .current-color{
   position: relative;
-  border: 1px solid #000;
+  border: 1px solid var(--border-color);
   width: 30px;
   height: 30px;
   transform: scale(1, 1);
@@ -479,7 +500,7 @@ export default {
     font-size: 11px;
     line-height: 11px;
     text-shadow: 0px 0px 1px #000, 0px 0px 1px #000, 0px 0px 1px #000, 0px 0px 1px #000;
-    color: #fff;
+    color: var(--light-color);
     transition: opacity .5s ease-in-out,
                 transform .5s ease-in-out;
   }
@@ -512,7 +533,7 @@ export default {
       position: absolute;
       bottom: 5px;
       right: 6px;
-      background-color: rgb(214, 125, 125);
+      background-color: var(--brand-color);
       width: 6px;
       height: 6px;
       border-radius: 50%;
@@ -541,8 +562,8 @@ export default {
   &--secondary{
     background-color: transparent;
     min-height: auto;
-    background-color: #333333;
-    color: #fff;
+    background-color: var(--primary-color);
+    color: var(--light-color);
     border-color: transparent;
   }
 
@@ -573,14 +594,14 @@ export default {
 
 .editor .vc-sketch{
   box-shadow: none;
-  background-color: #eaeaea;
+  background-color: var(--second-layer-bg);
 }
 
 .popper{
   box-shadow: rgb(138, 138, 138) 7px 7px 0px -4px;
   border-radius: 0;
-  background-color: #eaeaea;
-  border-color: #eaeaea;
+  background-color: var(--second-layer-bg);
+  border-color: var(--second-layer-bg);
 }
 
 .generated-art-field{
@@ -588,8 +609,8 @@ export default {
   min-height: 100px;
   max-height: 200px;
   resize: none;
-  background-color: #272727;
-  color: #dadada;
+  background-color: var(--primary-color);
+  color: var(--first-layer-bg);
   font-size: 12px;
 
   &__copy{
@@ -642,7 +663,7 @@ export default {
   }
 }
 
-.mobile-layer-btn{
+.mobile-frame-btn{
   position: fixed;
   bottom: 0;
   right: 0;

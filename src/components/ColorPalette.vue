@@ -4,8 +4,7 @@
       <div class="color-palette__bg__tile" v-for="i in 32" :key="i"></div>
     </div>
     <li v-for="(tile, i) in paletteList" :key="i" @click="pickedColor(tile)">
-      <button :style="{backgroundColor: tile.value}">
-        <span v-if="tile.name">{{tile.name}}</span>
+      <button :style="{backgroundColor: tile}">
       </button>
     </li>
   </ul>

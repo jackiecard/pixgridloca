@@ -27,6 +27,8 @@
                 <i>ctrl + {{item.val}}</i>
               </li>
             </ul>
+
+            <p>Credits for <a href="https://twitter.com/ENDESGA" target="_blank">ENDESGA</a> for the default color palette.</p>
           </div>
           <div slot="footer">
             <button class="btn btn--primary" @click="showModal = false">
@@ -122,9 +124,9 @@ export default {
           val: '8'
         },
         {
-          name: 'add layer',
+          name: 'add frame',
           icon: 'layer-group',
-          val: 'l'
+          val: '0'
         },
       ]
     }
@@ -142,14 +144,20 @@ body{
 }
 
 #app {
+  --primary-color: #333;
+  --brand-color: rgb(214, 125, 125);
+  --light-color: #fff;
   --border-color: rgba(0, 0, 0, 0.05);
+  --border-color-light: #ccc;
   --border-color-active: #ffffff;
+  --first-layer-bg: #dadada;
+  --second-layer-bg: #eaeaea;
 
   font-family: 'Inconsolata', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: var(--primary-color);
 
   button,
   input{
@@ -157,11 +165,11 @@ body{
   }
 
   .popper[x-placement^="bottom"] .popper__arrow {
-    border-color: transparent transparent #eaeaea transparent;
+    border-color: transparent transparent var(--second-layer-bg) transparent;
   }
 
   .popper[x-placement^="right"] .popper__arrow {
-    border-color: transparent #eaeaea transparent transparent;
+    border-color: transparent var(--second-layer-bg) transparent transparent;
   }
 
   footer{

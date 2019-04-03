@@ -93,7 +93,7 @@ export default {
   --border-size: 2px;
 
   &-wrapper{
-    background-color: #dadada;
+    background-color: var(--first-layer-bg);
     background-repeat: repeat;
     min-height: calc(100vh - 192px);
     overflow-x: auto; 
