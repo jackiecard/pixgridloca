@@ -91,16 +91,27 @@
             </button>
         </popper> 
         
-        <button class="btn btn--control" @click="showWarningModal = true" id="clean">
+        <button class="btn btn--control" @click="showNewProject = true" id="clean">
           New <font-awesome-icon icon="file" />
         </button>
 
-        <modal v-if="showWarningModal" 
-          @quit="showWarningModal = false" 
-          @accept="showWarningModal = false, setNewConfig()"
+        <modal v-if="showNewProject" 
+          @quit="showNewProject = false" 
+          @accept="showNewProject = false, setNewConfig()"
           :center=true>
-          <h3 slot="header">Are you sure?</h3>
-          <p slot="body">This is wipe out all the work done so far.</p>
+          <h3 slot="header">New Project</h3>
+          <div slot="body">
+            <div class="settings">
+              <label for="project-name">Project Name</label>
+              <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
+              <label for="canvas-width">Canvas Width</label>
+              <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
+              <label for="canvas-height">Canvas Height</label>
+              <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
+              <label for="tile-size">Tile Size</label>
+              <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
+            </div>
+          </div>
         </modal>
 
         <popper
@@ -164,19 +175,15 @@
               <div class="settings">
                 <label for="project-name">Project Name</label>
                 <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
-                <label for="canvas-width">Canvas Width</label>
-                <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
-                <label for="canvas-height">Canvas Height</label>
-                <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
                 <label for="tile-size">Tile Size</label>
                 <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
               </div>
-              <button class="btn btn--primary" @click="showWarningModal = true">Ok!</button>
+              <button class="btn btn--primary" @click="updateProjectSettings">Ok!</button>
             </div>
             <button slot="reference" class="btn btn--control" id="settings">
               Settings <font-awesome-icon icon="cog" />
             </button>
-        </popper> 
+        </popper>
 
       </template>
 
@@ -285,7 +292,8 @@ export default {
       newFrameName: '',
       showFrames: false,
       showImportPaletteView: false,
-      importedPalette: ''
+      importedPalette: '',
+      showNewProject: false
     }
   },
   computed: mapGetters([
@@ -345,6 +353,10 @@ export default {
       'updateFrameName',
       'importPalette'
     ]),
+    updateProjectSettings() {
+      this.setProjectName(this.newProjectName)
+      this.setTileSize(Number(this.newTileSize))
+    },
     importProject() {
       this.import(this.importedProject)
     },

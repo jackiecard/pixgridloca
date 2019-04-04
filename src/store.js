@@ -50,34 +50,19 @@ const generateCode = ({ frameGrid, canvasWidth, canvasHeight, tileSize, payload 
     return line;
   });
 
-  listLines.forEach((item, i) => {
+  listLines.forEach((item) => {
     if (item.color !== "transparent") {
-      list += `<div class="pixgrid-pixel" data-index="${i}" id="${
-        item.id
-      }" style="background-color: ${item.color}; grid-area: ${item.ys +
-        1} / ${item.xs + 1} / ${item.ys + 2} / ${item.xe + 2}"></div>`;
+      list += `<div class="pixgrid-p" style="background-color:${item.color};grid-area:${item.ys +1}/${item.xs + 1}/${item.ys + 2}/${item.xe + 2}"></div>`;
     }
   });
 
   if (payload && payload.minMax) {
     html = `
-    <div class="pixgrid-canvas" style="display: grid; grid-template-columns: repeat(
-      ${canvasWidth}, minmax(1px, 
-      ${tileSize}px)); grid-template-rows: repeat(
-      ${canvasHeight}, minmax(1px, 
-      ${tileSize}px));">
-      ${list}</div>
-  `;
+    <div class="pixgrid-c" style="display:grid;grid-template-columns:repeat(${canvasWidth},minmax(1px,${tileSize}px));grid-template-rows:repeat(${canvasHeight},minmax(1px,${tileSize}px));">${list}</div>`;
   }
   else{
     html = `
-      <div class="pixgrid-canvas" style="display: grid; grid-template-columns: repeat(
-        ${canvasWidth}, 
-        ${payload && payload.tileSize ? payload.tileSize : tileSize}px); grid-template-rows: repeat(
-        ${canvasHeight}, 
-        ${payload && payload.tileSize ? payload.tileSize : tileSize}px);">
-        ${list}</div>
-    `;
+      <div class="pixgrid-c" style="display:grid;grid-template-columns:repeat(${canvasWidth},${payload && payload.tileSize ? payload.tileSize : tileSize}px);grid-template-rows:repeat(${canvasHeight},${payload && payload.tileSize ? payload.tileSize : tileSize}px);">${list}</div>`;
   }
   return html;
 }
@@ -325,9 +310,9 @@ const mutations = {
     }
 
     const spritesCode = state.frames.map((x, i) => {
-      return `<div class="pixgrid-sprite" id="${x.id}" data-count="${i}" data-name="${kebabCase(x.name)}">${x.code}</div>`}).join('');
+      return `<div class="pixgrid-s" id="${x.id}" data-count="${i}" data-name="${kebabCase(x.name)}">${x.code}</div>`}).join('');
 
-    state.spritesCode = `<style>@keyframes sprite{${keyframe}}.pixgrid-animation{overflow: hidden;height: ${width}px;width: ${height}px;} .pixgrid-animation .pixgrid-wrapper{animation: sprite 1s steps(1) infinite;}</style><div class="pixgrid-animation" id="${state.projectId}" data-project-name="${kebabCase(state.projectName)}"><div class="pixgrid-wrapper">${spritesCode}</div></div>`;
+    state.spritesCode = `<style>@keyframes sprite{${keyframe}}.pixgrid-a{overflow: hidden;height: ${height}px;width: ${width}px;} .pixgrid-a .pixgrid-w{animation: sprite 1s steps(1) infinite;}</style><div class="pixgrid-a" id="${state.projectId}" data-project-name="${kebabCase(state.projectName)}"><div class="pixgrid-w">${spritesCode}</div></div>`;
   },
   importPalette(state, payload) {
     let hexList = [];
