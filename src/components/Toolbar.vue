@@ -33,7 +33,6 @@ nav{
   .palette{
     position: relative;
     display: flex;
-    margin: auto;
 
     @media (min-width: 800px) {
       margin: inherit;
@@ -41,7 +40,7 @@ nav{
 
     &__info{
       margin-top: 1px;
-      height: 63px;
+      height: 53px;
 
       .btn{
         position: relative;
@@ -52,6 +51,15 @@ nav{
         .hide{
           font-size: 0;
         }
+
+        &.add{
+          width: calc(100% - 10px);
+        }
+      }
+
+      &__control{
+        display: flex;
+        justify-content: flex-end;
       }
     }
   }
@@ -84,8 +92,14 @@ nav{
     display: none;
 
     @media (min-width: 800px) {
-      height: calc(100vh - 40px);
       display: block;
+      top: 71px;
+      height: calc(100vh - 120px);
+    }
+
+    @media (min-width: 1114px) {
+      top: 0;
+      height: calc(100vh - 40px);
     }
 
     &--show{

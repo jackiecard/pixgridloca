@@ -67,6 +67,29 @@ const generateCode = ({ frameGrid, canvasWidth, canvasHeight, tileSize, payload 
   return html;
 }
 
+const generateSpriteCode = ({ canvasWidth, canvasHeight, tileSize, frames, projectId, projectName }) => {
+  let keyframe = "";
+  const width = canvasWidth * tileSize;
+  const height = canvasHeight * tileSize;
+  const size = frames.length + 1;
+  let acumulatedtMargin = 0;
+
+  for (let i = 0; i < size; i++) {
+    let margin =
+      i + 1 === size ? acumulatedtMargin - height : acumulatedtMargin;
+    acumulatedtMargin = acumulatedtMargin + height;
+    keyframe += `${i * (100 / (size - 1))}% {margin-top: -${margin}px;}`;
+  }
+
+  const spritesCode = frames
+    .map((x, i) => {
+      return `<div class="pixgrid-s" id="${x.id}" data-count="${i}" data-name="${kebabCase(x.name)}">${x.code}</div>`;
+    })
+    .join("");
+
+  return `<style>@keyframes sprite{${keyframe}}.pixgrid-a{overflow: hidden;height: ${height}px;width: ${width}px;} .pixgrid-a .pixgrid-w{animation: sprite 1s steps(1) infinite;}</style><div class="pixgrid-a" id="${projectId}" data-project-name="${kebabCase(projectName)}"><div class="pixgrid-w">${spritesCode}</div></div>`;
+};
+
 const checkHex = (value) => {
   if (
     value.includes("rgb") ||
@@ -123,26 +146,34 @@ const mutations = {
     state.zoom = 1;
   },
   addColor(state, payload) {
-    if (state.paletteList.indexOf(payload) >= 0){
+    if (state.paletteList.indexOf(payload) >= 0) {
       return;
     }
-    state.paletteList.push(payload);
+    let newPallete = [payload].concat(state.paletteList);
+    state.paletteList = newPallete;
+  },
+  newPallete(state) {
+    state.paletteList = [];
   },
   pickedColor(state, payload) {
     state.currentColor = payload;
   },
   setFrameGrid(state, payload) {
+    if (payload.clean) {
+      state.frameGrid = generateList();
+      return;
+    }
     if (payload.first || !payload.pressed) {
       state.backupFrameGrid = payload.list.map(x => ({ ...x }));
     }
-    state.frameGrid = payload.list.map(x => ({...x}));
+    state.frameGrid = payload.list.map(x => ({ ...x }));
   },
   updateListItem(state, payload) {
     if (!payload.pressed) {
       state.backupFrameGrid = state.frameGrid.map(x => ({ ...x }));
     }
     const list = state.frameGrid.map(item => {
-      if(item.id === payload.id){
+      if (item.id === payload.id) {
         if (state.isEraser) {
           item.color = "transparent";
         } else {
@@ -216,7 +247,7 @@ const mutations = {
       return;
     }
 
-    if(payload.config){
+    if (payload.config) {
       state.frames = payload.config.frames.map(a => {
         a.codeForView = generateCode({
           frameGrid: a.canvas,
@@ -257,17 +288,17 @@ const mutations = {
   updateFrame(state, payload) {
     const frames = state.frames.map(item => {
       if (item.id === payload.id) {
-          item.code = state.spriteCode;
-          item.canvas = state.frameGrid;
-          item.codeForView = generateCode({
-            frameGrid: state.frameGrid,
-            canvasWidth: state.canvasWidth,
-            canvasHeight: state.canvasHeight,
-            tileSize: state.tileSize,
-            payload: {
-              tileSize: 5
-            }
-          });
+        item.code = state.spriteCode;
+        item.canvas = state.frameGrid;
+        item.codeForView = generateCode({
+          frameGrid: state.frameGrid,
+          canvasWidth: state.canvasWidth,
+          canvasHeight: state.canvasHeight,
+          tileSize: state.tileSize,
+          payload: {
+            tileSize: 5
+          }
+        });
 
         if (payload.name) {
           item.name = payload.name;
@@ -296,23 +327,7 @@ const mutations = {
     state.frames = frames;
   },
   generateSprite(state) {
-    let keyframe = "";
-    const width = state.canvasWidth * state.tileSize;
-    const height = state.canvasHeight * state.tileSize;
-    const size = state.frames.length + 1;
-    let acumulatedtMargin = 0;
-
-    for (let i = 0; i < size; i++) {
-      let margin =
-        i + 1 === size ? acumulatedtMargin - height : acumulatedtMargin;
-      acumulatedtMargin = acumulatedtMargin + height;
-      keyframe += `${i * (100 / (size - 1))}% {margin-top: -${margin}px;}`;
-    }
-
-    const spritesCode = state.frames.map((x, i) => {
-      return `<div class="pixgrid-s" id="${x.id}" data-count="${i}" data-name="${kebabCase(x.name)}">${x.code}</div>`}).join('');
-
-    state.spritesCode = `<style>@keyframes sprite{${keyframe}}.pixgrid-a{overflow: hidden;height: ${height}px;width: ${width}px;} .pixgrid-a .pixgrid-w{animation: sprite 1s steps(1) infinite;}</style><div class="pixgrid-a" id="${state.projectId}" data-project-name="${kebabCase(state.projectName)}"><div class="pixgrid-w">${spritesCode}</div></div>`;
+    state.spritesCode = generateSpriteCode(state);
   },
   importPalette(state, payload) {
     let hexList = [];
@@ -365,6 +380,7 @@ const actions = {
     commit("eraser", false);
     commit("pickedColor", payload);
   },
+  newPallete: ({ commit }) => commit("newPallete"),
   generateSpriteCode: ({ commit }, payload) => commit("generateSpriteCode", payload),
   eraser: ({ commit }, payload) => commit("eraser", payload),
   undo: ({ commit }) => commit("undo"),
@@ -417,7 +433,8 @@ const getters = {
   save: state => state.save,
   projectName: state => state.projectName,
   frames: state => state.frames,
-  spritesCode: state => state.spritesCode
+  spritesCode: state => state.spritesCode,
+  exportedSingleSprite: state => state.exportedSingleSprite
 };
 
 // const vuexPersist = new VuexPersist({

@@ -8,14 +8,20 @@
             trigger="click"
             :options="{ placement: 'top' }">
             <div class="popper">
-              <div>
+                <div class="palette__info__control">
+                  <button
+                    @click="newPallete"
+                    class="btn btn--a11y btn--small-icons">New <font-awesome-icon icon="file" /></button>
+                  <button
+                    @click.prevent="exportPallete"
+                    class="btn btn--a11y btn--small-icons">Export <font-awesome-icon icon="save" /></button>
+                  <button
+                    @click="showImportPaletteView = true"
+                    class="btn btn--a11y btn--small-icons">Import <font-awesome-icon icon="upload" /></button>
+                </div>
                 <sketch-picker v-model="newColor" 
                   :presetColors="paletteList"/>
-                <button class="btn btn--primary" @click="setColor(newColor.hex8)">Add Color</button>
-                <button
-                  @click="showImportPaletteView = true"
-                  class="btn btn--primary">Import Palette</button>
-                </div>
+                <button class="btn btn--primary add" @click="setColor(newColor.hex8)">Add Color</button>
             </div>
             <button slot="reference" class="btn btn--control" id="colorPicker">
               <span class="hide">Add Color</span> 
@@ -27,6 +33,17 @@
           </popper>
         </div>
 
+        <modal v-if="exportedPallete !== ''" 
+          @accept="exportedPallete = ''"
+          :center=true>
+          <h3 slot="header">Exported Pallete</h3>
+          <div slot="body">
+            <textarea class="generated-art-field" 
+              @click="copyContent('palleteTextarea')" 
+              id="palleteTextarea">{{this.exportedPallete}}</textarea>
+            <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+          </div>
+        </modal>
         <modal v-if="showImportPaletteView" 
           @quit="showImportPaletteView = false" 
           @accept="showImportPaletteView = false, importPalette(importedPalette)"
@@ -56,6 +73,10 @@
 
         <button class="btn btn--control" @click="undo(), toggleUndo()">
           {{undoOn ? 'Redo' : 'Undo'}} <font-awesome-icon :icon="undoOn ? 'redo' : 'undo'" />
+        </button>
+        
+        <button class="btn btn--control" @click="setFrameGrid({ clean: true })" id="clean">
+          Clean <font-awesome-icon icon="brush" />
         </button>
 
         <popper
@@ -90,7 +111,7 @@
               Zoom <font-awesome-icon icon="search" />
             </button>
         </popper> 
-        
+
         <button class="btn btn--control" @click="showNewProject = true" id="clean">
           New <font-awesome-icon icon="file" />
         </button>
@@ -105,11 +126,11 @@
               <label for="project-name">Project Name</label>
               <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
               <label for="canvas-width">Canvas Width</label>
-              <input type="text" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
+              <input type="number" min="4" max="300" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
               <label for="canvas-height">Canvas Height</label>
-              <input type="text" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
+              <input type="number" min="4" max="300" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
               <label for="tile-size">Tile Size</label>
-              <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
+              <input  type="number" min="1" max="100" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
             </div>
           </div>
         </modal>
@@ -293,7 +314,8 @@ export default {
       showFrames: false,
       showImportPaletteView: false,
       importedPalette: '',
-      showNewProject: false
+      showNewProject: false,
+      exportedPallete: ''
     }
   },
   computed: mapGetters([
@@ -336,6 +358,7 @@ export default {
       'zoomReset',
       'addColor',
       'pickedColor',
+      'newPallete',
       'generateArt',
       'eraser',
       'undo',
@@ -373,6 +396,9 @@ export default {
     setColor(color) {
       this.addColor(color);
       this.newColor = "";
+    },
+    exportPallete() {
+      this.exportedPallete = this.paletteList.join('\n');
     },
     copyContent(field) {
       const textarea = document.querySelector('#' + field);
@@ -566,6 +592,13 @@ export default {
     padding: 5px 0;
   }
 
+  &--small-icons{
+    .svg-inline--fa{
+      height: 10px;
+      padding: 3px 0;
+    }
+  }
+
   &--primary{
     background-color: rgba(255, 255, 255, 0.45098039215686275);
     min-height: auto;
@@ -600,12 +633,14 @@ export default {
   }
 
   &--a11y{
+    background-color: rgba(255, 255, 255, 0.45098039215686275);
     font-size: 0;
   }
 }
 
 .editor .vc-sketch{
   box-shadow: none;
+  padding-top: 0;
   background-color: var(--second-layer-bg);
 }
 
@@ -626,7 +661,6 @@ export default {
   font-size: 12px;
 
   &__copy{
-    text-align: right;
     opacity: 0;
     transition: .5s opacity ease-in-out;
 
