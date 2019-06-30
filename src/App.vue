@@ -174,6 +174,7 @@ body{
 
   footer{
     padding: 20px 0;
+    font-size: .75rem;
 
     .svg-inline--fa{
       height: 12px;

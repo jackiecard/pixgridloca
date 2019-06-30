@@ -69,7 +69,7 @@ nav{
     display: grid;
     grid-template-columns: repeat(5, 1fr);
 
-    @media (min-width: 800px) {
+    @media (min-width: 1000px) {
       margin-top: -7px;
       grid-template-columns: repeat(10, 1fr);
     }

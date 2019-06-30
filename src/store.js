@@ -6,7 +6,7 @@ const utils = require( "./utils");
 
 Vue.use(Vuex);
 
-const generateList= () => {
+const generateList = () => {
   const list = [];
   const size = state.canvasWidth * state.canvasHeight;
 
@@ -49,45 +49,44 @@ const generateCode = ({ frameGrid, canvasWidth, canvasHeight, tileSize, payload 
     }
     return line;
   });
-
+  
   listLines.forEach((item) => {
     if (item.color !== "transparent") {
-      list += `<div class="pixgrid-p" style="background-color:${item.color};grid-area:${item.ys +1}/${item.xs + 1}/${item.ys + 2}/${item.xe + 2}"></div>`;
+      list += `<div style="background:${item.color};grid-area:${item.ys +1}/${item.xs + 1}/${item.ys + 2}/${item.xe + 2}"></div>`;
     }
   });
 
   if (payload && payload.minMax) {
     html = `
-    <div class="pixgrid-c" style="display:grid;grid-template-columns:repeat(${canvasWidth},minmax(1px,${tileSize}px));grid-template-rows:repeat(${canvasHeight},minmax(1px,${tileSize}px));">${list}</div>`;
+    <div style="display:grid;grid-template-columns:repeat(${canvasWidth},minmax(1px,${tileSize}px));grid-template-rows:repeat(${canvasHeight},minmax(1px,${tileSize}px));">${list}</div>`;
   }
   else{
     html = `
-      <div class="pixgrid-c" style="display:grid;grid-template-columns:repeat(${canvasWidth},${payload && payload.tileSize ? payload.tileSize : tileSize}px);grid-template-rows:repeat(${canvasHeight},${payload && payload.tileSize ? payload.tileSize : tileSize}px);">${list}</div>`;
+      <div style="display:grid;grid-template-columns:repeat(${canvasWidth},${payload && payload.tileSize ? payload.tileSize : tileSize}px);grid-template-rows:repeat(${canvasHeight},${payload && payload.tileSize ? payload.tileSize : tileSize}px);">${list}</div>`;
   }
   return html;
 }
 
-const generateSpriteCode = ({ canvasWidth, canvasHeight, tileSize, frames, projectId, projectName }) => {
+const generateSpriteCode = ({ canvasWidth, canvasHeight, tileSize, frames, projectName }) => {
   let keyframe = "";
   const width = canvasWidth * tileSize;
   const height = canvasHeight * tileSize;
   const size = frames.length + 1;
-  let acumulatedtMargin = 0;
 
   for (let i = 0; i < size; i++) {
-    let margin =
-      i + 1 === size ? acumulatedtMargin - height : acumulatedtMargin;
-    acumulatedtMargin = acumulatedtMargin + height;
-    keyframe += `${i * (100 / (size - 1))}% {margin-top: -${margin}px;}`;
+    const last = i + 1 === size;
+    let margin = last ? 100 * (i - 1) : 100 * i;
+    let percent = last ? 100 : i * Math.floor(parseInt(100 / (size - 1)));
+    keyframe += `${percent}% {margin-top: -${margin}%;}`;
   }
 
   const spritesCode = frames
-    .map((x, i) => {
-      return `<div class="pixgrid-s" id="${x.id}" data-count="${i}" data-name="${kebabCase(x.name)}">${x.code}</div>`;
+    .map((x) => {
+      return x.code;
     })
     .join("");
 
-  return `<style>@keyframes sprite{${keyframe}}.pixgrid-a{overflow: hidden;height: ${height}px;width: ${width}px;} .pixgrid-a .pixgrid-w{animation: sprite 1s steps(1) infinite;}</style><div class="pixgrid-a" id="${projectId}" data-project-name="${kebabCase(projectName)}"><div class="pixgrid-w">${spritesCode}</div></div>`;
+  return `<style>@keyframes sprite{${keyframe}}#${kebabCase(projectName)}{overflow: hidden;height: ${height}px;width: ${width}px;} #${kebabCase(projectName)} #pixgrid{animation: sprite 1s steps(1) infinite;}</style><div id="${kebabCase(projectName)}"><div id="pixgrid">${spritesCode}</div></div>`;
 };
 
 const checkHex = (value) => {
@@ -388,7 +387,13 @@ const actions = {
   setCanvasHeight: ({ commit }, payload) => commit("setCanvasHeight", payload),
   setTileSize: ({ commit }, payload) => commit("setTileSize", payload),
   setProjectName: ({ commit }, payload) => commit("setProjectName", payload),
-  saveState: ({ commit }) => commit("saveState"),
+  saveState: ({ commit }) => {
+    if (!state.frames.length) {
+      commit("generateSpriteCode");
+      commit("setFrames", {});
+    }
+    commit("saveState")
+  },
   import: ({ commit }, payload) => {
     const obj = JSON.parse(payload);
     commit("setFrames", { config: obj });
@@ -399,7 +404,13 @@ const actions = {
     commit("setProjectName", obj.projectName);
     commit("generateSpriteCode", { clear: true });
   },
-  generateSprite: ({ commit }) => commit("generateSprite"),
+  generateSprite: ({ commit }) => {
+    if (!state.frames.length) {
+      commit("generateSpriteCode");
+      commit("setFrames", {});
+    }
+    commit("generateSprite")
+  },
   setFrames: ({ commit }, payload) => {
     commit("generateSpriteCode");
     commit("setFrames", payload);
