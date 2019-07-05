@@ -40,7 +40,7 @@ nav{
 
     &__info{
       margin-top: 1px;
-      height: 53px;
+      height: 46px;
 
       .btn{
         position: relative;

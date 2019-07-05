@@ -113,7 +113,7 @@ const state = {
   showGrid: true,
   showRuler: true,
   zoom: 1,
-  tileSize: 40,
+  tileSize: 20,
   newColor: "",
   bouncePickedColor: false,
   isEraser: false,

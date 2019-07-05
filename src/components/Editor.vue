@@ -521,8 +521,8 @@ export default {
 .current-color{
   position: relative;
   border: 1px solid var(--border-color);
-  width: 30px;
-  height: 30px;
+  width: 18px;
+  height: 18px;
   transform: scale(1, 1);
   box-shadow: 0px 0px 0px #8e8e8e;
   transition: transform .5s .25s ease-in-out,

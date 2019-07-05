@@ -88,9 +88,10 @@ export default {
   padding: 0;
   z-index: 1;
 
-  --border-color: rgba(0, 0, 0, 0.1);
+  --border-color: rgba(0, 0, 0, 0.3);
   --border-color-light: rgba(255, 255, 255, 0.1);
-  --border-size: 2px;
+  --border-size: 1px;
+  --border-type: solid;
 
   &-wrapper{
     background-color: var(--first-layer-bg);
@@ -125,7 +126,7 @@ export default {
   }
 
   &--grid{
-    border-left: var(--border-size) dashed var(--border-color);
+    border-left: var(--border-size) var(--border-type) var(--border-color);
     position: relative;
     &:before{
       content: "";
@@ -134,7 +135,7 @@ export default {
       height: 100%;
       top: 0;
       left: 0;
-      border-left: var(--border-size) dashed var(--border-color-light);
+      border-left: var(--border-size) var(--border-type) var(--border-color-light);
     }
 
     &.tiles--ruler{
@@ -149,8 +150,8 @@ export default {
     }
 
     li{
-      border-bottom: var(--border-size) dashed var(--border-color);
-      border-right: var(--border-size) dashed var(--border-color);
+      border-bottom: var(--border-size) var(--border-type) var(--border-color);
+      border-right: var(--border-size) var(--border-type) var(--border-color);
 
       position: relative;
       &:before{
@@ -160,13 +161,13 @@ export default {
         height: 100%;
         top: 0;
         left: 0;
-        border-bottom: var(--border-size) dashed var(--border-color-light);
-        border-right: var(--border-size) dashed var(--border-color-light);
+        border-bottom: var(--border-size) var(--border-type) var(--border-color-light);
+        border-right: var(--border-size) var(--border-type) var(--border-color-light);
       }
 
       &.first-row{
         position: relative;
-        border-top: var(--border-size) dashed var(--border-color);
+        border-top: var(--border-size) var(--border-type) var(--border-color);
         position: relative;
 
         .tile__info{

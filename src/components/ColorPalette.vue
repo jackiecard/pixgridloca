@@ -29,8 +29,8 @@ export default {
 
 <style lang="scss" scoped>
 .color-palette{
-  --square-size: 25px;
-  --li-size: 23px;
+  --square-size: 22px;
+  --li-size: 20px;
 
   position: relative;
   display: grid;
