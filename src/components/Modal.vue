@@ -17,10 +17,10 @@
           <div class="modal-footer">
             <slot name="footer">
               <button class="btn btn--primary" @click="$emit('accept')">
-                OK
+                {{$t('buttons.accept')}}
               </button>
               <button class="btn btn--secondary" @click="$emit('quit')">
-                Cancel
+                {{$t('buttons.cancel')}}
               </button>
             </slot>
           </div>

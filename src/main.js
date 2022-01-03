@@ -6,6 +6,31 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { Sketch } from "vue-color";
 import Popper from "vue-popperjs";
 import "vue-popperjs/dist/vue-popper.css";
+import enLang from "./localization/en.config";
+import ptbrLang from "./localization/ptbr.config";
+
+import i18next from 'i18next';
+import VueI18Next from '@panter/vue-i18next';
+
+Vue.use(VueI18Next);
+
+window.userLang = navigator.language || navigator.userLanguage;
+
+const resources = {
+  en: { translation: enLang },
+  pt: { translation: ptbrLang }
+}
+
+i18next.init({
+  lng: window.userLang,
+  fallbackLng: 'en',
+  resources
+});
+
+console.log(window.userLang)
+const i18n = new VueI18Next(i18next);
+
+
 
 config.autoAddCss = false;
 
@@ -35,5 +60,6 @@ Vue.config.devtools = true;
 
 new Vue({
   store,
+  i18n: i18n,
   render: h => h(App)
 }).$mount("#app");

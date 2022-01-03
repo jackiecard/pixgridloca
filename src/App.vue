@@ -5,7 +5,7 @@
         <div class="brand__logo">
           <div class="art" style="display: grid; grid-template-columns: repeat(11, 2px); grid-template-rows: repeat(10, 2px);"> <div class="pixel" id="p2" style="background-color: #D67D7D; grid-area: 1 / 3 / 2 / 4"></div><div class="pixel" id="p3" style="background-color: #D67D7D; grid-area: 1 / 4 / 2 / 5"></div><div class="pixel" id="p7" style="background-color: #D67D7D; grid-area: 1 / 8 / 2 / 9"></div><div class="pixel" id="p8" style="background-color: #D67D7D; grid-area: 1 / 9 / 2 / 10"></div><div class="pixel" id="p12" style="background-color: #D67D7D; grid-area: 2 / 2 / 3 / 3"></div><div class="pixel" id="p13" style="background-color: #D67D7D; grid-area: 2 / 3 / 3 / 4"></div><div class="pixel" id="p14" style="background-color: #D67D7D; grid-area: 2 / 4 / 3 / 5"></div><div class="pixel" id="p15" style="background-color: #D67D7D; grid-area: 2 / 5 / 3 / 6"></div><div class="pixel" id="p17" style="background-color: #D67D7D; grid-area: 2 / 7 / 3 / 8"></div><div class="pixel" id="p18" style="background-color: #D67D7D; grid-area: 2 / 8 / 3 / 9"></div><div class="pixel" id="p19" style="background-color: #D67D7D; grid-area: 2 / 9 / 3 / 10"></div><div class="pixel" id="p20" style="background-color: #D67D7D; grid-area: 2 / 10 / 3 / 11"></div><div class="pixel" id="p22" style="background-color: #D67D7D; grid-area: 3 / 1 / 4 / 2"></div><div class="pixel" id="p23" style="background-color: #D67D7D; grid-area: 3 / 2 / 4 / 3"></div><div class="pixel" id="p24" style="background-color: #D67D7D; grid-area: 3 / 3 / 4 / 4"></div><div class="pixel" id="p25" style="background-color: #D67D7D; grid-area: 3 / 4 / 4 / 5"></div><div class="pixel" id="p26" style="background-color: #D67D7D; grid-area: 3 / 5 / 4 / 6"></div><div class="pixel" id="p27" style="background-color: #D67D7D; grid-area: 3 / 6 / 4 / 7"></div><div class="pixel" id="p28" style="background-color: #D67D7D; grid-area: 3 / 7 / 4 / 8"></div><div class="pixel" id="p29" style="background-color: #D67D7D; grid-area: 3 / 8 / 4 / 9"></div><div class="pixel" id="p30" style="background-color: #D67D7D; grid-area: 3 / 9 / 4 / 10"></div><div class="pixel" id="p31" style="background-color: #D67D7D; grid-area: 3 / 10 / 4 / 11"></div><div class="pixel" id="p32" style="background-color: #D67D7D; grid-area: 3 / 11 / 4 / 12"></div><div class="pixel" id="p33" style="background-color: #D67D7D; grid-area: 4 / 1 / 5 / 2"></div><div class="pixel" id="p34" style="background-color: #D67D7D; grid-area: 4 / 2 / 5 / 3"></div><div class="pixel" id="p35" style="background-color: #D67D7D; grid-area: 4 / 3 / 5 / 4"></div><div class="pixel" id="p36" style="background-color: #D67D7D; grid-area: 4 / 4 / 5 / 5"></div><div class="pixel" id="p37" style="background-color: #D67D7D; grid-area: 4 / 5 / 5 / 6"></div><div class="pixel" id="p38" style="background-color: #D67D7D; grid-area: 4 / 6 / 5 / 7"></div><div class="pixel" id="p39" style="background-color: #D67D7D; grid-area: 4 / 7 / 5 / 8"></div><div class="pixel" id="p40" style="background-color: #D67D7D; grid-area: 4 / 8 / 5 / 9"></div><div class="pixel" id="p41" style="background-color: #D67D7D; grid-area: 4 / 9 / 5 / 10"></div><div class="pixel" id="p42" style="background-color: #D67D7D; grid-area: 4 / 10 / 5 / 11"></div><div class="pixel" id="p43" style="background-color: #D67D7D; grid-area: 4 / 11 / 5 / 12"></div><div class="pixel" id="p44" style="background-color: #D67D7D; grid-area: 5 / 1 / 6 / 2"></div><div class="pixel" id="p45" style="background-color: #D67D7D; grid-area: 5 / 2 / 6 / 3"></div><div class="pixel" id="p46" style="background-color: #D67D7D; grid-area: 5 / 3 / 6 / 4"></div><div class="pixel" id="p47" style="background-color: #D67D7D; grid-area: 5 / 4 / 6 / 5"></div><div class="pixel" id="p48" style="background-color: #D67D7D; grid-area: 5 / 5 / 6 / 6"></div><div class="pixel" id="p49" style="background-color: #D67D7D; grid-area: 5 / 6 / 6 / 7"></div><div class="pixel" id="p50" style="background-color: #D67D7D; grid-area: 5 / 7 / 6 / 8"></div><div class="pixel" id="p51" style="background-color: #D67D7D; grid-area: 5 / 8 / 6 / 9"></div><div class="pixel" id="p52" style="background-color: #D67D7D; grid-area: 5 / 9 / 6 / 10"></div><div class="pixel" id="p53" style="background-color: #D67D7D; grid-area: 5 / 10 / 6 / 11"></div><div class="pixel" id="p54" style="background-color: #D67D7D; grid-area: 5 / 11 / 6 / 12"></div><div class="pixel" id="p56" style="background-color: #D67D7D; grid-area: 6 / 2 / 7 / 3"></div><div class="pixel" id="p57" style="background-color: #D67D7D; grid-area: 6 / 3 / 7 / 4"></div><div class="pixel" id="p58" style="background-color: #D67D7D; grid-area: 6 / 4 / 7 / 5"></div><div class="pixel" id="p59" style="background-color: #D67D7D; grid-area: 6 / 5 / 7 / 6"></div><div class="pixel" id="p60" style="background-color: #D67D7D; grid-area: 6 / 6 / 7 / 7"></div><div class="pixel" id="p61" style="background-color: #D67D7D; grid-area: 6 / 7 / 7 / 8"></div><div class="pixel" id="p62" style="background-color: #D67D7D; grid-area: 6 / 8 / 7 / 9"></div><div class="pixel" id="p63" style="background-color: #D67D7D; grid-area: 6 / 9 / 7 / 10"></div><div class="pixel" id="p64" style="background-color: #D67D7D; grid-area: 6 / 10 / 7 / 11"></div><div class="pixel" id="p68" style="background-color: #D67D7D; grid-area: 7 / 3 / 8 / 4"></div><div class="pixel" id="p69" style="background-color: #D67D7D; grid-area: 7 / 4 / 8 / 5"></div><div class="pixel" id="p70" style="background-color: #D67D7D; grid-area: 7 / 5 / 8 / 6"></div><div class="pixel" id="p71" style="background-color: #D67D7D; grid-area: 7 / 6 / 8 / 7"></div><div class="pixel" id="p72" style="background-color: #D67D7D; grid-area: 7 / 7 / 8 / 8"></div><div class="pixel" id="p73" style="background-color: #D67D7D; grid-area: 7 / 8 / 8 / 9"></div><div class="pixel" id="p74" style="background-color: #D67D7D; grid-area: 7 / 9 / 8 / 10"></div><div class="pixel" id="p80" style="background-color: #D67D7D; grid-area: 8 / 4 / 9 / 5"></div><div class="pixel" id="p81" style="background-color: #D67D7D; grid-area: 8 / 5 / 9 / 6"></div><div class="pixel" id="p82" style="background-color: #D67D7D; grid-area: 8 / 6 / 9 / 7"></div><div class="pixel" id="p83" style="background-color: #D67D7D; grid-area: 8 / 7 / 9 / 8"></div><div class="pixel" id="p84" style="background-color: #D67D7D; grid-area: 8 / 8 / 9 / 9"></div><div class="pixel" id="p92" style="background-color: #D67D7D; grid-area: 9 / 5 / 10 / 6"></div><div class="pixel" id="p93" style="background-color: #D67D7D; grid-area: 9 / 6 / 10 / 7"></div><div class="pixel" id="p94" style="background-color: #D67D7D; grid-area: 9 / 7 / 10 / 8"></div><div class="pixel" id="p104" style="background-color: #D67D7D; grid-area: 10 / 6 / 11 / 7"></div> </div> 
         </div>
-        <span>PixGrid Editor <sup>Beta</sup></span>
+        <span>PixGrid Editor <sup>Beta</sup> </span>
       </template>
       <template slot="info">
         <button class="btn app-info" @click="showModal = true">
@@ -13,13 +13,13 @@
         </button>
 
         <modal v-if="showModal">
-          <h3 slot="header">What is this place?</h3>
+          <h3 slot="header">{{$t("about.title")}}</h3>
           <div slot="body">
-            <p>PixGrid is a pixel art editor that uses <strong>CSS Grid Layout</strong> to build HTML/CSS only animations. </p>
-            <p>These code can be pasted in any website or platform that accepts <strong>HTML</strong> and browsers that support Grid Layout.</p>
-            <p>It was created and it's mantained by <a href="https://twitter.com/jackiecard_" target="_blank" title="twitter">jackiecard</a>.</p>
+            <p v-html="$t('about.descriptionLine1')"></p>
+            <p v-html="$t('about.descriptionLine2')"></p>
+            <p v-html="$t('about.descriptionLine3')"></p>
 
-            <h3>List of shortcuts</h3>
+            <h3>{{$t('about.listOfShortCutsTitle')}}</h3>
             <ul class="shortcuts-list">
               <li v-for="(item, i) in shortcuts" :key="i" class="shortcuts-list__item">
                 <font-awesome-icon :icon="item.icon" />
@@ -28,11 +28,11 @@
               </li>
             </ul>
 
-            <p>Credits for <a href="https://twitter.com/ENDESGA" target="_blank">ENDESGA</a> for the default color palette.</p>
+            <p v-html="$t('about.credits')"></p>
           </div>
           <div slot="footer">
             <button class="btn btn--primary" @click="showModal = false">
-                OK
+              {{$t('buttons.accept')}}
             </button>
           </div>
         </modal>
@@ -54,77 +54,77 @@ export default {
       showModal: false,
       shortcuts: [
         {
-          name: 'color pallete',
+          name: this.$t('shortcuts.palette'),
           icon: 'palette',
           val: 'p'
         },
         {
-          name: 'color picker',
+          name: this.$t('shortcuts.tint'),
           icon: 'tint',
           val: '1'
         },
         {
-          name: 'eraser',
+          name: this.$t('shortcuts.eraser'),
           icon: 'eraser',
           val: 'e'
         },
         {
-          name: 'pencil',
+          name: this.$t('shortcuts.pencil'),
           icon: 'pen',
           val: 'w'
         },
         {
-          name: 'zoom',
+          name: this.$t('shortcuts.zoom'),
           icon: 'search',
           val: '2'
         },
         {
-          name: 'zoom in',
+          name: this.$t('shortcuts.zoomIn'),
           icon: 'search-plus',
           val: '='
         },
         {
-          name: 'zoom out',
+          name: this.$t('shortcuts.zoomOut'),
           icon: 'search-minus',
           val: '-'
         },
         {
-          name: 'zoom reset',
+          name: this.$t('shortcuts.zoomReset'),
           icon: 'search',
           val: ']'
         },
         {
-          name: 'undo',
+          name: this.$t('shortcuts.undo'),
           icon: 'undo',
           val: 'z'
         },
         {
-          name: 'clean',
+          name: this.$t('shortcuts.clean'),
           icon: 'times',
           val: '4'
         },
         {
-          name: 'settings',
+          name: this.$t('shortcuts.settings'),
           icon: 'cog',
           val: '5'
         },
         {
-          name: 'save',
+          name: this.$t('shortcuts.save'),
           icon: 'save',
           val: '6'
         },
         {
-          name: 'import',
+          name: this.$t('shortcuts.import'),
           icon: 'upload',
           val: '7'
         },
         {
-          name: 'Make',
+          name: this.$t('shortcuts.make'),
           icon: 'plus-circle',
           val: '8'
         },
         {
-          name: 'add frame',
+          name: this.$t('shortcuts.addFrame'),
           icon: 'layer-group',
           val: '0'
         },

@@ -11,23 +11,23 @@
                 <div class="palette__info__control">
                   <button
                     @click="newPallete"
-                    class="btn btn--a11y btn--small-icons">New <font-awesome-icon icon="file" /></button>
+                    class="btn btn--a11y btn--small-icons">{{$t('pallete.new')}} <font-awesome-icon icon="file" /></button>
                   <button
                     @click.prevent="exportPallete"
-                    class="btn btn--a11y btn--small-icons">Export <font-awesome-icon icon="save" /></button>
+                    class="btn btn--a11y btn--small-icons">{{$t('pallete.eport')}} <font-awesome-icon icon="save" /></button>
                   <button
                     @click="showImportPaletteView = true"
-                    class="btn btn--a11y btn--small-icons">Import <font-awesome-icon icon="upload" /></button>
+                    class="btn btn--a11y btn--small-icons">{{$t('pallete.import')}} <font-awesome-icon icon="upload" /></button>
                 </div>
                 <sketch-picker v-model="newColor" 
                   :presetColors="paletteList"/>
-                <button class="btn btn--primary add" @click="setColor(newColor.hex8)">Add Color</button>
+                <button class="btn btn--primary add" @click="setColor(newColor.hex8)">{{$t('pallete.addColor')}}</button>
             </div>
             <button slot="reference" class="btn btn--control" id="colorPicker">
-              <span class="hide">Add Color</span> 
+              <span class="hide">{{$t('pallete.addColor')}}</span> 
               <font-awesome-icon icon="plus" />
               <div :class="['current-color', {'current-color--bounce': bouncePickedColor}]" :style="{backgroundColor: currentColor}">
-                <span class="current-color__doubled">Already here!</span>
+                <span class="current-color__doubled">{{$t('pallete.warning')}}</span>
               </div>
             </button>
           </popper>
@@ -36,24 +36,21 @@
         <modal v-if="exportedPallete !== ''" 
           @accept="exportedPallete = ''"
           :center=true>
-          <h3 slot="header">Exported Pallete</h3>
+          <h3 slot="header">{{$t('pallete.exportedTitle')}}</h3>
           <div slot="body">
             <textarea class="generated-art-field" 
               @click="copyContent('palleteTextarea')" 
               id="palleteTextarea">{{this.exportedPallete}}</textarea>
-            <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+            <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">{{$t('messages.copied')}}</div>
           </div>
         </modal>
         <modal v-if="showImportPaletteView" 
           @quit="showImportPaletteView = false" 
           @accept="showImportPaletteView = false, importPalette(importedPalette)"
           :center=true>
-          <h3 slot="header">Import Palette</h3>
+          <h3 slot="header">{{$t('pallete.importTitle')}}</h3>
           <div slot="body">
-            <p>Hi! We'll be working on a easier way to import files.</p>
-            <p>For now, you can paste each color (hex, rga, hsl) separated by line break. </p>
-            <p><a href="https://lospec.com" target="_blank">LOSPEC</a> has a incredible collection of <a href="https://lospec.com/palette-list" target="_blank">palettes</a> 
-              that you can use by downloding the .HEX file that you can paste here. 🙂</p>
+            <div v-html="$t('pallete.importBody')"></div>
             <textarea class="generated-art-field" 
               v-model="importedPalette"></textarea>
           </div>
@@ -63,20 +60,20 @@
 
       <template slot="control">
         <button :class="['btn btn--control', {'btn--active': isEraser}]" @click="eraser(true)">
-          Eraser <font-awesome-icon icon="eraser" />
+          {{$t('toolbar.eraser')}} <font-awesome-icon icon="eraser" />
           
         </button>
         <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">
-          Pencil <font-awesome-icon icon="pen" />
+          {{$t('toolbar.pencil')}} <font-awesome-icon icon="pen" />
         </button>
 
 
         <button class="btn btn--control" @click="undo(), toggleUndo()">
-          {{undoOn ? 'Redo' : 'Undo'}} <font-awesome-icon :icon="undoOn ? 'redo' : 'undo'" />
+          {{undoOn ? $t('toolbar.redo') : $t('toolbar.undo') }} <font-awesome-icon :icon="undoOn ? 'redo' : 'undo'" />
         </button>
         
         <button class="btn btn--control" @click="setFrameGrid({ clean: true })" id="clean">
-          Clean <font-awesome-icon icon="brush" />
+           {{$t('toolbar.clean')}} <font-awesome-icon icon="brush" />
         </button>
 
         <popper
@@ -87,49 +84,50 @@
                 <button :class="['btn btn--control', {'btn--disabled': zoom === 8}]" 
                   @click="zoomIn()"
                   id="zoom-in">
-                  Zoom In 
+                  {{$t('toolbar.zoomIn')}}
                   <font-awesome-icon icon="search-plus" />
                   
                 </button>
                 <button :class="['btn btn--control', {'btn--disabled': zoom === 1/ this.tileSize}]" 
                   @click="zoomOut()"
                   id="zoom-out">
-                  Zoom Out 
+                  {{$t('toolbar.zoomOut')}}
                   <font-awesome-icon icon="search-minus" />
                   
                 </button>
                 <button class="btn btn--control" 
                   @click="zoomReset()"
-                  id="zoom-reset">Reset Zoom 
+                  id="zoom-reset">
+                  {{$t('toolbar.zoomReset')}}
                   <font-awesome-icon icon="search" />
                   
                 </button>
               </div>
-              <div>Zoom {{zoom*100}}%</div>
+              <div>{{$t('toolbar.zoom')}} {{zoom*100}}%</div>
             </div>
             <button slot="reference" class="btn btn--control zoom" id="zoom">
-              Zoom <font-awesome-icon icon="search" />
+               {{$t('toolbar.zoom')}} <font-awesome-icon icon="search" />
             </button>
         </popper> 
 
         <button class="btn btn--control" @click="showNewProject = true" id="clean">
-          New <font-awesome-icon icon="file" />
+           {{$t('toolbar.new')}} <font-awesome-icon icon="file" />
         </button>
 
         <modal v-if="showNewProject" 
           @quit="showNewProject = false" 
           @accept="showNewProject = false, setNewConfig()"
           :center=true>
-          <h3 slot="header">New Project</h3>
+          <h3 slot="header">{{$t('project.new')}}</h3>
           <div slot="body">
             <div class="settings">
-              <label for="project-name">Project Name</label>
+              <label for="project-name">{{$t('project.name')}}</label>
               <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
-              <label for="canvas-width">Canvas Width</label>
+              <label for="canvas-width">{{$t('project.width')}}</label>
               <input type="number" min="4" max="300" v-model="newCanvasWidth" placeholder="Canvas Width" name="canvas-width" class="small-input"/>
-              <label for="canvas-height">Canvas Height</label>
+              <label for="canvas-height">{{$t('project.height')}}</label>
               <input type="number" min="4" max="300" v-model="newCanvasHeight" placeholder="Canvas Height" name="canvas-height" class="small-input"/>
-              <label for="tile-size">Tile Size</label>
+              <label for="tile-size">{{$t('project.size')}}</label>
               <input  type="number" min="1" max="100" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
             </div>
           </div>
@@ -140,17 +138,16 @@
             :options="{ placement: 'bottom' }">
             <div class="popper">
               <div class="save-settings">
-                <h3>Save it for later</h3>
+                <h3>{{$t('saveIt')}}</h3>
                 <textarea class="generated-art-field" 
                   v-if="save" 
                   @click="copyContent('saveTextarea')" 
                   id="saveTextarea">{{this.save}}</textarea>
-                <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+                <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">{{$t('messages.copied')}}</div>
               </div>
             </div>
             <button slot="reference" class="btn btn--control" @click="saveState()" id="save-btn">
-              Save <font-awesome-icon icon="save" />
-              
+               {{$t('toolbar.save')}} <font-awesome-icon icon="save" />
             </button>
         </popper> 
 
@@ -160,14 +157,14 @@
             :options="{ placement: 'bottom' }">
             <div class="popper">
               <div class="save-settings">
-                <h3>Import project</h3>
+                <h3>{{$t('importProject')}}</h3>
                 <textarea class="generated-art-field" 
                   v-model="importedProject"></textarea>
               </div>
-              <button class="btn btn--primary" @click="importProject">Ok!</button>
+              <button class="btn btn--primary" @click="importProject">{{$t('buttons.accept')}}</button>
             </div>
             <button slot="reference" class="btn btn--control" id="import-btn">
-              Import <font-awesome-icon icon="upload" />
+               {{$t('toolbar.import')}} <font-awesome-icon icon="upload" />
               
             </button>
         </popper> 
@@ -181,10 +178,10 @@
                 v-if="spritesCode" 
                 @click="copyContent('buildTextarea')" 
                 id="buildTextarea">{{this.spritesCode.trim()}}</textarea>
-              <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+              <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">{{$t('messages.copied')}}</div>
             </div>
             <button slot="reference" class="btn btn--control" @click="generateSprite()" id="export">
-              Make <font-awesome-icon icon="plus-circle" />
+               {{$t('toolbar.make')}} <font-awesome-icon icon="plus-circle" />
             </button>
         </popper>
 
@@ -194,15 +191,15 @@
             :options="{ placement: 'bottom' }">
             <div class="popper">
               <div class="settings">
-                <label for="project-name">Project Name</label>
+                <label for="project-name">{{$t('project.name')}}</label>
                 <input type="text" v-model="newProjectName" placeholder="Project Name" name="project-name"/>
-                <label for="tile-size">Tile Size</label>
+                <label for="tile-size">{{$t('project.size')}}</label>
                 <input type="text" v-model="newTileSize" placeholder="Tile Size" name="tile-size" class="small-input"/>
               </div>
-              <button class="btn btn--primary" @click="updateProjectSettings">Ok!</button>
+              <button class="btn btn--primary" @click="updateProjectSettings">{{$t('buttons.accept')}}</button>
             </div>
             <button slot="reference" class="btn btn--control" id="settings">
-              Settings <font-awesome-icon icon="cog" />
+               {{$t('toolbar.settings')}} <font-awesome-icon icon="cog" />
             </button>
         </popper>
 
@@ -228,18 +225,18 @@
                 <button class="btn btn--a11y btn--control" 
                   v-if="itemIsUpdating === draw.id" 
                   @click="updateFrame({ id: draw.id }), itemIsUpdating = null">
-                  Save changes
+                  {{$t('frame.save')}}
                   <font-awesome-icon icon="check" />
                 </button>
                 <button class="btn btn--a11y btn--control" 
                   v-if="!itemIsUpdating" 
                   @click="setFrameGrid({ list: draw.canvas }), itemIsUpdating = draw.id">
-                  Edit
+                  {{$t('frame.edit')}}
                   <font-awesome-icon icon="edit" />
                 </button>
                 <button class="btn btn--a11y btn--control" 
                   @click="removeFrame({ id: draw.id })">
-                  Remove
+                  {{$t('frame.remove')}}
                   <font-awesome-icon icon="trash-alt" />
                 </button>
 
@@ -247,22 +244,22 @@
                   trigger="click"
                   :options="{ placement: 'left' }">
                     <div class="popper">
-                      <h3>Sprite code:</h3>
+                      <h3>{{$t('frame.spriteCode')}}</h3>
                       <textarea class="generated-art-field" 
                         v-if="draw.code" 
                         @click="copyContent('singleSpriteTextarea')" 
                         id="singleSpriteTextarea">{{draw.code.trim()}}</textarea>
-                      <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">Copied!</div>
+                      <div :class="['generated-art-field__copy', {'generated-art-field__copy--show': showCopiedTip}]">{{$t('messages.copied')}}</div>
                     </div>
                     <button slot="reference" class="btn btn--a11y btn--control">
-                      Export
+                      {{$t('pallete.export')}}
                       <font-awesome-icon icon="file-download" />
                     </button>
                 </popper> 
               </div>
             </div>
           </div>
-          <button class="btn set-frame-btn" @click="setFrames" id="add-frame"><font-awesome-icon icon="plus" /> <span>Add Frame</span></button>
+          <button class="btn set-frame-btn" @click="setFrames" id="add-frame"><font-awesome-icon icon="plus" /> <span>{{$t('frame.addFrame')}}</span></button>
         </div>
       </template>
     </Toolbar>
