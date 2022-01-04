@@ -60,7 +60,7 @@
 
       <template slot="control">
         <button :class="['btn btn--control', {'btn--active': isEraser}]" @click="eraser(true)">
-          {{$t('toolbar.eraser')}} <font-awesome-icon icon="eraser" />
+          {{$t('toolbar.eraser')}} <font-awesome-icon :icon="$t('icon.eraser')" />
           
         </button>
         <button :class="['btn btn--control', {'btn--active': !isEraser}]" @click="eraser(false)">

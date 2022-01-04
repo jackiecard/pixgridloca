@@ -1,4 +1,11 @@
 module.exports = {
+  icon: {
+    eraser: 'eraser',
+    pen: 'pen',
+    redo: 'redo',
+    undo: 'undo',
+    brush: 'brush',
+  },
   buttons: {
     accept: "ok",
     cancel: "cancel"
@@ -21,7 +28,7 @@ module.exports = {
     addFrame: "Add Frame",
   },
   toolbar: {
-    eraser: "EN Eraser",
+    eraser: "Eraser",
     pencil: "Pencil",
     undo: "Undo",
     redo: "Redo",

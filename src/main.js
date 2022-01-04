@@ -27,9 +27,7 @@ i18next.init({
   resources
 });
 
-console.log(window.userLang)
 const i18n = new VueI18Next(i18next);
-
 
 
 config.autoAddCss = false;
